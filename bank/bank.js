@@ -4,12 +4,11 @@ const readline = require('readline-sync');
 // -----------------------------------------------
 // Clear the screen
 // -----------------------------------------------
-function clearScreeen()
+function clearScreen()		//changed screeen to screen
 {
 	// Clear the screen
 	console.log('\033[2J');
 }
-
 
 // ------------------------------------------------
 // The constructor for the Account class
@@ -30,32 +29,38 @@ function Account(acctName, acctBalance, type)
 
 	// The account type
 	this.type = type;
-	
+}																	//moved curly brackets before prototypes
+
 	// Returns the account name
-	this.getAcctName = function() { return this.acctName; }
+	Account.prototype.getAcctName = function() { return this.acctName; }									//changed to protype
 	
 	// Returns the account balance
-	this.getBalance = function() { return this.acctBalance; }
+	Account.prototype.getBalance = function() { return this.acctBalance; }									//changed to protype
 	
 	// Returns the account type
-	this.getAccountType = function() { return this.type; }
+	Account.prototype.getAccountType = function() { return this.type; }										//changed to protype
 	
 	// Deposits money to the account
 	// @param amount - the amount to deposit
-	this.deposit = function(amount) { this.acctBalance  = this.acctBalance +  amount; }
+	Account.prototype.deposit = function(amount) { this.acctBalance  = Math.trunc((parseFloat(this.acctBalance) +  parseFloat(amount)) * 100) / 100; }		//changed to protype / trunc'd the total / changed to float
 	
 	// Withdraws money from the account
 	// @param amount - the amount to withdraw
-	this.withdraw = function(amount){ this.acctBalance = this.acctBalance - amount; }
-	
+	Account.prototype.withdraw = function(amount){ 
+		if(amount < this.acctBalane) {
+			this.acctBalance = Math.trunc((parseFloat(this.acctBalance) - parseFloat(amount)) * 100) / 100;			//changed to protype / trunc'd the total / changed to float
+		}
+		else {
+			console.log("Insufficient Funds \n");
+		}
+	}
 	// Prints the account information
-	this.printAcct = function()
+	Account.prototype.printAcct = function()																//changed to protype
 	{
 		console.log("Account name: ", this.getAcctName());
 		console.log("Account type: ", this.getAccountType());
 		console.log("Account balance: ", this.getBalance(), "\n");
 	}
-}
 
 // ------------------------------------------------
 // The constructor for the customer class
@@ -68,27 +73,27 @@ function Customer(userName, userPassword)
 	this.userName = userName;
 	this.userPassword = userPassword;
 	
+	// The list of accounts	
+	this.accounts = []														//moved this.accounts above prototype inside Customer() function
+}
+	
 	// Returns the username
-	this.getUserName = function() { return this.userName; }
+	Customer.prototype.getUserName = function() { return this.userName; }
 	
 	// Returns the password
-	this.getPassword = function() { return this.userPassword; }
+	Customer.prototype.getPassword = function() { return this.userPassword; }
 	
 	// Returns the accounts
-	this.getAccounts = function() { return this.accounts; }
+	Customer.prototype.getAccounts = function() { return this.accounts; }
 	
 	// Add account
 	// @param account - the account
-	this.addAccount = function(account) { this.accounts.push(account); }
+	Customer.prototype.addAccount = function(account) { this.accounts.push(account); }
 	
 	// Returns the account based on the account index
 	// @param acctIndex - the account index
 	// @return - the account based on the index	
-	this.getAccount = function(acctIndex) { return this.accounts[acctIndex]; }
-		
-	// The list of accounts	
-	this.accounts = []	
-}
+	Customer.prototype.getAccount = function(acctIndex) { return this.accounts[acctIndex]; }
 
 // ----------------------------------------------
 // The constructor of the Bank class
@@ -106,13 +111,14 @@ function Bank(name, initCustomerList)
 	this.customers = {};
 	
 	// The welcome banner ad!
-	for(var i = 0; i < 3; i++)
+	for(let i = 0; i < 3; i++)
 	{
 		console.log("Welcome to ", name, "!\n");
 	}
 		
 	// Initialize the customer map
-	while(i < initCustomerList.length)
+	let i = 0;															// initialized let i = 0
+	while(i < initCustomerList.length)													
 	{
 		// Get the customer
 		customer = initCustomerList[i];
@@ -122,6 +128,7 @@ function Bank(name, initCustomerList)
 		// Next user!	
 		i += 1;	
 	}
+}																		//moved curly bracket above prototypes
 	
 	// -------------------------------------------------------------
 	// Creates a new user with the specified user name and password.
@@ -130,10 +137,10 @@ function Bank(name, initCustomerList)
 	// @param userPassword - the user password
 	// The newly created user.
 	// -------------------------------------------------------------
-	this.createAndAddCustomer = function(userName, userPassword)
+	Bank.prototype.createAndAddCustomer = function(userName, userPassword)								//changed to prototype
 	{
 		// Create a new customer
-		var customer = new Customer(userName, userPassword);	
+		let customer = new Customer(userName, userPassword);	
 		
 		// Save the customer
 		this.customers[customer.getUserName()] = customer;
@@ -142,13 +149,13 @@ function Bank(name, initCustomerList)
 	// ----------------------------------------------
 	// Allows the user to enroll in the bank (the UI)
 	// ----------------------------------------------
-	this.createCustomerUI = function()
+	Bank.prototype.createCustomerUI = function()														// changed to prototype
 	{
 		// Create user name
-		var userName = readline.question("Please pick a user name: ");
+		let userName = readline.question("Please pick a user name: ");									// changed var to let
 		
 		// Pick the password 
-		var userPassword = readline.question("Please pick a user password: ");	
+		let userPassword = readline.question("Please pick a user password: ");							//changed var to let
 		
 		// Create and add user
 		this.createAndAddCustomer(userName, userPassword);
@@ -160,8 +167,9 @@ function Bank(name, initCustomerList)
 	// The user action selection menu
 	// @param customer - the customer 
 	// -----------------------------------------------
-	this.userActionMenuUI = function(customer)
+	Bank.prototype.userActionMenuUI = function(customer)										// changed to a prototype
 	{
+		let choice = null;												//initialized choice to insure another choice option
 		do
 		{
 			// Get the user input and create a customer object
@@ -176,49 +184,111 @@ function Bank(name, initCustomerList)
 			console.log("-----------------------------------------------\n\n");
 
 			// Accept input
-			var choice = readline.question("Choice: ");
+			choice = readline.question("Choice: ");										//removed var
+			
+			//checks if inputs are valid and numbers 1-6
+			while(isNaN(choice) || !isFinite(choice) || !Number.isInteger(parseFloat(choice)) || parseInt(choice) <= 0 || parseInt(choice) > 7)			// created a while loop to check for valid numbers only
+			{
+				console.log("-----------------------------------------------");
+				console.log("1. Deposit");
+				console.log("2. Withdraw");
+				console.log("3. Transfer");
+				console.log("4. View Accounts");
+				console.log("5. Open New Account");
+				console.log("6. Remove Account");
+				console.log("7. Logout");
+				console.log("-----------------------------------------------\n\n");
+				console.log("Please enter a valid input.\n");
+			
+				choice = readline.question("Choice: ");
+			}
 			
 			// Decide what to do
 			
 			// Deposit	
-			if(choice == 1)
+			if(parseInt(choice) === 1)															//changed == to === / parseInt()
 			{
-				console.log("Deposit");
-				this.depositUI(customer);
+				if(customer.accounts.length < 1) 												//created an if statement for 0 accounts opened
+				{
+					console.log("\nYou have 0 active accounts open.");
+					console.log("Please, press 5 to activate a new account. \n");
+				}
+				else
+				{
+					console.log("Deposit");
+					this.depositUI(customer);
+				}
 			}
 			// Withdraw
-			else if(choice == 2)
+			else if(parseInt(choice) === 2)														//changed == to === / parseInt()
 			{
-				console.log("Withdraw");
-				this.withdrawUI(customer);
+				if(customer.accounts.length < 1)												//created an if statement for 0 accounts opened
+				{
+					console.log("\nYou have 0 active accounts open.");
+					console.log("Please, press 5 to activate a new account. \n");
+				}
+				else
+				{
+					console.log("Withdraw");
+					this.withdrawUI(customer);
+				}
 			}
 			// Transfer
-			else if(choice == 3)
+			else if(parseInt(choice) === 3)														//changed == to === / parseInt()
 			{
-				console.log("Transfer");
-				this.transferUI(customer);
+				if(customer.accounts.length === 0)												//created an if statement for 0 accounts opened
+				{
+					console.log("\nYou have 0 active accounts open, need a minimum of 2 accounts.");
+					console.log("Please, press 5 to activate a new account. \n");
+				}
+				else if(customer.accounts.length === 1)											//created an if statement for 1 account opened
+				{
+					console.log("\nYou have 1 active account open, need a minimum of 2 accounts.");
+					console.log("Please, press 5 to activate a new account. \n");
+				}
+				else
+				{
+					console.log("Transfer");
+					this.transferUI(customer);
+				}
 			}
 			// View accounts
-			else if(choice == 4)
+			else if(parseInt(choice) === 4)														//changed == to === / parseInt()
 			{
-				console.log("View Accounts");
-				this.viewAccounts(customer);
+				if(customer.accounts.length < 1)												//created an if statement for 0 account opened
+				{
+					console.log("\nYou have 0 active accounts open.");
+					console.log("Please, press 5 to activate a new account. \n");
+				}
+				else
+				{
+					console.log("View Accounts");
+					this.viewAccounts(customer);
+				}
 				
 			}
 			// Open new account
-			else if(choice == 5)
+			else if(parseInt(choice) === 5)														//changed == to === / parseInt()
 			{
 				console.log("Open New Account");
 				this.openAccountUI(customer);
 			}
 			// Close customer account
-			else if(choice == 6)
+			else if(parseInt(choice) === 6)														//changed == to === / parseInt()
 			{
-				console.log("Remove Account");
-				this.closeAccount(customer)
+				if(customer.accounts.length < 1)												//created an if statement for 0 account opened
+				{
+					console.log("\nYou have 0 active accounts open.");
+					console.log("Please, press 5 to activate a new account. \n");
+				}
+				else
+				{
+					console.log("Remove Account");
+					this.closeAccount(customer);													//missing semicolon ;
+				}
 			}
 		}
-		while(choice != 7);
+		while(parseInt(choice) !== 7);																//changes != to !==
 	}
 	
 	
@@ -227,13 +297,13 @@ function Bank(name, initCustomerList)
 	// @param customer - the customer for which
 	// to print the customer
 	// -------------------------------------------
-	this.viewAccounts = function(customer) 
-	{
+	Bank.prototype.viewAccounts = function(customer) 												//changed to a prototype
+	{	
 		// Get the accounts
-		var accounts = customer.getAccounts();
+		let accounts = customer.getAccounts();														//changed var to let
 		
 		// The account counter
-		var accountNum = 1;
+		let accountNum = 1;																			//changed var to let
 			
 		// Print the accounts
 		for(account of accounts)
@@ -249,52 +319,63 @@ function Bank(name, initCustomerList)
 	// ------------------------------------------------------------
 	// Master choice menu
 	// ------------------------------------------------------------
-	this.masterChoice = function()
+	Bank.prototype.masterChoice = function()														//changed to prototype
 	{
+		let choice = 0;									// choice has to be outside scope to check in do while
 		do
 		{
 			console.log("What would you like to do?");
 			console.log("1. Login");
 			console.log("2. Create Account\n");
 			
-			// Get the choice
-			var choice = readline.question("Choice: ");	
+			// make sure input is either 1 or 2
+			while(true)
+			{
+				// Get the choice
+				choice = readline.question("Choice: ");	// changed var to let
+				choice = parseInt(choice);				// make sure choice is int 
+				if(choice === 1 || choice === 2)	    // make sure its either 1 or 2
+					break;
+				else
+				{
+					console.log("Invalid input. Try again.");
+				}
+			}
 			
-
 			// Login
-			if(choice == 1)	
+			if(choice === 1)	
 				this.loginUI();
 
 			// Create new user account
-			else if (choice == 2)
+			else if (choice === 2)
 				this.createCustomerUI();
-			
+
 		}while(choice != 1 && choice != 2);
 	}
 	
 	// -------------------------------------------------------------
 	// The login menu
 	// -------------------------------------------------------------
-	this.loginUI = function()
+	Bank.prototype.loginUI = function()
 	{
+		let match = false;											// match has to be outside scope to use in do
+		let userName = '';											// username has to be out of scope too
 		do
 		{
 			console.log("Please enter your user name and password");
 		
 			// Get the user name
-			var userName = readline.question("Username: ");
+			userName = readline.question("Username: ");			
 	
 			// Get the password	
-			var userPassword = readline.question("Password: ");
+			let userPassword = readline.question("Password: ");		// change var to let
 				
 			// Whether there was a match
-			var match = this.login(userName, userPassword);
-		
+			match = this.login(userName, userPassword);	
 		} while(!match);
 		
-		
 		// Get the customer
-		var customer = this.getCustomer(userName);
+		let customer = this.getCustomer(userName);					// change var to let
 		
 		// Show the user menu
 		this.userActionMenuUI(customer);
@@ -306,16 +387,16 @@ function Bank(name, initCustomerList)
 	// @param userName - the user name
 	// @param userPassword - the user password
 	// -----------------------------------------------
-	this.login = function(userName, userPassword)
+	Bank.prototype.login = function(userName, userPassword)
 	{		
 		// The match
-		var match = false;
+		let match = false;										// change var to let
 		
 		// Is this a registered user?
 		if(userName in this.customers)
 		{
 			// Get the customer
-			var customer = this.customers[userName];
+			let customer = this.customers[userName];			// change var to let
 			
 			// Check the password
 			if(customer.getPassword() == userPassword) { match = true; }
@@ -335,10 +416,10 @@ function Bank(name, initCustomerList)
 	// @return - the object of type Account rerepsenting
 	// the newly created account
 	// ---------------------------------------------------
-	this.createAccount = function(customer, acctName, initialDeposits, type)
+	Bank.prototype.createAccount = function(customer, acctName, initialDeposits, type)
 	{
 		// Create a new account
-		var account = new Account(acctName, initialDeposits, type);
+		let account = new Account(acctName, initialDeposits, type);
 		
 		// Add account to the user
 		customer.addAccount(account);
@@ -350,24 +431,41 @@ function Bank(name, initCustomerList)
 	// @param customer - the customer for whom to open
 	// the account
 	// ------------------------------------------------------
-	this.openAccountUI = function(customer)
+	Bank.prototype.openAccountUI = function(customer)
 	{
 		// The account name
-		var accountName = readline.question("Please choose an account name: ");	
+		let accountName = readline.question("Please choose an account name: ");	
 		
 		// Get the account type
-		var accountType = readline.question("Please choose (1) for savings and (2) for checking: ");
+		let accountType = '';
 		
 		// The account type
-		var choosenType = null;
+		let choosenType = null;
 		
-		// The account type: sacings or checking
-		if(accountType == 1) { choosenType = "savings"; }
-		else { choosenType = "checking"; }
-		
-		// The initial deposit	
-		var initialDeposit = readline.question("Please enter the deposit amount: ");
-		
+		while(true)												// make sure account chosen is either 1 or 2
+		{
+			accountType = readline.question("Please choose (1) for savings and (2) for checking: ");
+			accountType = parseInt(accountType);
+			// The account type: savings or checking
+			if(accountType === 1) { choosenType = "savings"; break;}
+			else if(accountType === 2){ choosenType = "checking"; break;}
+			else {console.log("Invalid input. Try again.")}
+		}
+
+
+		// make sure deposit is a number and greater than 0
+		let initialDeposit = 0
+		while(true)
+		{
+			// The initial deposit	
+			initialDeposit = readline.question("Please enter the deposit amount: ");
+			initialDeposit = parseFloat(initialDeposit);
+			if(initialDeposit > 0)
+				break;
+			else
+				console.log("Invalid input. Try again.")
+		}
+
 		// The account name
 		this.createAccount(customer, accountName, parseFloat(initialDeposit), accountType);
 	}
@@ -376,7 +474,7 @@ function Bank(name, initCustomerList)
 	// The UI for depositing money
 	// @param user - the owner of the account
 	// ------------------------------------------------------
-	this.depositUI = function(user)
+	Bank.prototype.depositUI = function(user)
 	{
 		// The deposit account
 		//MIG: Stopped here
@@ -384,18 +482,38 @@ function Bank(name, initCustomerList)
 		// Show all accounts of the user
 		this.viewAccounts(user);
 		
-		// Get the account choice
-		var accountIndex = readline.question("Please select an account by entering a choice (e.g., enter 1 for the first account) ");
-		
+		// make sure choice is between 1 and account.length
+		let accountIndex = 0
+		while(true)
+		{
+			// Get the account choice
+			accountIndex = readline.question("Please select an account by entering a choice (e.g., enter 1 for the first account) ");
+			accountIndex = parseInt(accountIndex);
+			
+			if(accountIndex > 0 && accountIndex <= user.accounts.length)
+				break;	
+			else
+				console.log("Invalid input. Try again.");
+		}
+	
 		// Get the account based on index
-		var account = user.getAccount(accountIndex - 1);	
+		let account = user.getAccount(accountIndex - 1);	
 		
-		// Get the deposit amount
-		var depositAmount = readline.question("Please enter the deposit amount: ");
+		// make sure amount is a number and positive
+		let depositAmount = 0;
+		while(true)
+		{
+			// Get the deposit amount
+			depositAmount = readline.question("Please enter the deposit amount: ");
+			depositAmount = parseFloat(depositAmount);
+			if(depositAmount > 0)
+				break;
+			else
+				console.log("Not a valid input. Try again.")
+		}
 		
 		// Deposit the money	
 		account.deposit(depositAmount);			
-		
 		
 		console.log("Updated account information: ");
 		account.printAcct();		
@@ -404,19 +522,31 @@ function Bank(name, initCustomerList)
 	// ------------------------------------------------------
 	// The UI for withdrawing the money
 	// ------------------------------------------------------
-	this.withdrawUI = function(customer)
+	Bank.prototype.withdrawUI = function(customer)
 	{	
 		// Show all accounts of the user
 		this.viewAccounts(customer);
 		
 		// Get the account choice
-		var accountIndex = readline.question("Please select an account by entering a choice (e.g., enter 1 for the first account) ");
+		let accountIndex = readline.question("Please select an account by entering a choice (e.g., enter 1 for the first account) ");
 		
 		// Get the account based on index
-		var account = customer.getAccount(accountIndex - 1);	
+		let account = customer.getAccount(accountIndex - 1);	
 		
-		// Get the withdraw amount
-		var withdrawAmount = readline.question("Please enter the withraw amount: ");
+		// make sure withdraw amount is > 0 and a number
+		// we are allowing the user to withdraw more than they have to 
+		// charage them overdraft fees
+		let withdrawAmount = 0;
+		while(true)
+		{
+			// Get the withdraw amount
+			withdrawAmount = readline.question("Please enter the withraw amount: ");
+			withdrawAmount = parseFloat(withdrawAmount);
+			if(withdrawAmount > 0)
+				break;
+			else
+				console.log("Not a valid input. Try again.")
+		}
 		
 		// Deposit the money	
 		account.withdraw(withdrawAmount);			
@@ -426,32 +556,30 @@ function Bank(name, initCustomerList)
 		account.printAcct();
 	}
 
-	
 	// -----------------------------------------------------
 	// The UI for transferring the money
 	// @param customer - the customer for whom to perform the
 	// transaction
 	// -----------------------------------------------------
-	this.transferUI = function(customer)
+	Bank.prototype.transferUI = function(customer)
 	{
-		
 		// Show the account information
 		this.viewAccounts(customer);
 			
 		// Get the source account
-		var accountIndex = readline.question("Please select the source account by entering a choice (e.g., enter 1 for the first account) ");
+		let accountIndex = readline.question("Please select the source account by entering a choice (e.g., enter 1 for the first account) ");
 		
 		// Get the destination account based on index
-		var srcAccount = customer.getAccount(accountIndex - 1);
+		let srcAccount = customer.getAccount(accountIndex - 1);
 		
 		// Get the destination account
 		accountIndex = readline.question("Please select the destination by entering a choice (e.g., enter 1 for the first account) ");
 		
 		// Get the destination account based on index
-		var dstAccount = customer.getAccount(accountIndex - 1);		
+		let dstAccount = customer.getAccount(accountIndex - 1);		
 		
 		// Get the transfer amount
-		var transferAmount = readline.question("Please enter the transfer amount: ");
+		let transferAmount = readline.question("Please enter the transfer amount: ");
 		
 		// Withdraw the money from the source account
 		srcAccount.withdraw(transferAmount);
@@ -463,22 +591,21 @@ function Bank(name, initCustomerList)
 		srcAccount.printAcct();
 		console.log("\n");
 		dstAccount.printAcct();
-
 	}
 		
 	// ---------------------------------------------
 	// Shows all the user accounts
 	// @param user - the user whose accounts to view
 	// ----------------------------------------------
-	this.showAccounts = function(user)
+	Bank.prototype.showAccounts = function(user)
 	{
 		// Get the accounts
-		var accounts = user.getAccounts();
+		let accounts = user.getAccounts();
 		
 		console.log(accounts);
 			
 		// The account number
-		var acctNum = 0;
+		let acctNum = 0;
 		
 		// Print all the accounts
 		for(account of accounts)
@@ -492,13 +619,13 @@ function Bank(name, initCustomerList)
 	// @param userName - the user name
 	// @return - the user name
 	// --------------------------------------------
-	this.getCustomer = function(userName) 
+	Bank.prototype.getCustomer = function(userName) 
 	{ 
 		return this.customers[userName]; 
 	}
 	
 	// Opens the bank for business.
-	this.start = function()
+	Bank.prototype.start = function()
 	{
 		// Keep running
 		while(true) 
@@ -506,10 +633,9 @@ function Bank(name, initCustomerList)
 			this.masterChoice();
 			
 			// Clear screen
-			clearScreeen();
+			clearScreen();		//changed screeen to screen
 		}
 	}
-}
 
 // ---- Sample Test Code --------
 
@@ -533,6 +659,5 @@ var customers = [c1, c2, c3];
 
 // Create a bank object
 var myBank = new Bank("Kitty Bank", customers);
-
 
 myBank.start();
