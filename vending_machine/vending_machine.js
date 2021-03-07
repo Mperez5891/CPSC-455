@@ -1,5 +1,4 @@
 // For reading the keyboard input
-
 const readline = require('readline-sync');
 
 //---------------------------------------------
