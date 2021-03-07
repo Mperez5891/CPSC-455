@@ -6,7 +6,6 @@ const readline = require('readline-sync');
 // @param items - an array of items
 // @param prices - the price of each item
 //--------------------------------------------
-
 function VendingMachine(items, prices)
 {
 	// Save the items and prices
@@ -148,7 +147,6 @@ function VendingMachine(items, prices)
 	// Returns the money to the user
 	// @param amount - the sum of money to return
 	// ------------------------------------------------
-
 	this.returnMoney = function(amount)
 	{
 		// The amount in cents
