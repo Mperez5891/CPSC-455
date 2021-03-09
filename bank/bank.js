@@ -659,6 +659,64 @@ function Bank(name, initCustomerList)
 			console.log(acctNum, account.getName(), " ", account.getBalance())
 		}
 	}
+
+	// Created a function to close a bank account
+	Bank.prototype.closeAccount = function(customer)														//created close account function
+	{
+		// Get the account choice to close
+		let accountIndex = 0;
+	
+		while(true)
+		{
+			accountIndex = readline.question("Please select the account you wish to delete permanently (e.g., enter 1 for the first account): ");
+			if(accountIndex > 0 && accountIndex <= customer.accounts.length)
+				break;
+			else
+				console.log("Invalid input. Try again.");
+		}
+
+		// Get the account based on index
+		let account = customer.getAccount(accountIndex - 1);
+		
+		// Compare the 2 accounts
+		let accountIndex2 = 0;
+		if(customer.accounts.length > 1) 
+		{
+			// Get the destination account
+			accountIndex2 = readline.question("Please select which account to transfer the remaining funds (e.g., enter 1 for the first account): ");
+		
+			// Check that the user input a valid account and not the same account they're trying to remove.
+			while(isNaN(accountIndex2) || !isFinite(accountIndex2) || !Number.isInteger(parseFloat(accountIndex2)) || parseInt(accountIndex2) <= 0 || parseInt(accountIndex) === parseInt(accountIndex2) || parseInt(accountIndex2) > (customer.accounts.length))
+			{
+				if(Number.isInteger(parseFloat(accountIndex2)) && parseInt(accountIndex2) === parseInt(accountIndex))
+				{
+					console.log("\nInvalid input. Please select an account you have not selected already");
+				}
+				console.log("Invalid input. Try again");
+				accountIndex2 = readline.question("Please select which account to transfer the remaining funds (e.g., enter 1 for the first account): ");
+			}
+
+			// Get the destination account based on index
+			let dstAccount = customer.getAccount(accountIndex2 - 1);	
+	
+	
+			//Transfer money from closed account to other account
+			newBalance = parseFloat(account.acctBalance) + parseFloat(dstAccount.acctBalance)
+			dstAccount.acctBalance = Math.trunc(newBalance * 100) / 100 ;
+
+		}
+		
+		// Warning for user that they're about to delete last account
+		this.viewAccounts(customer);
+		if (customer.accounts.length <= 1) 
+		{
+			console.log("Careful, you are about to delete your last account!");
+		}
+	
+		// Removes the account from list of accounts
+		customer.accounts.splice(accountIndex - 1, 1);
+		this.viewAccounts(customer);
+	}
 	
 	// --------------------------------------------
 	// Returns the customer based on the user name
