@@ -613,8 +613,19 @@ function Bank(name, initCustomerList)
 		// Get the destination account based on index
 		let dstAccount = customer.getAccount(accountIndex - 1);		
 		
-		// Get the transfer amount
-		let transferAmount = readline.question("Please enter the transfer amount: ");
+		
+		// Get the transfer amount						// make sure the amount is less than or equal to the amount in that account
+		let transferAmount = 0;
+		while(true)
+		{
+			transferAmount = readline.question("Please enter the transfer amount: ");
+			transferAmount = parseInt(transferAmount);
+			
+			if(transferAmount <= srcAccount.acctBalance && transferAmount > 0)
+				break;
+			else
+				console.log("Not a valid input. Try again")
+		}
 		
 		// Withdraw the money from the source account
 		srcAccount.withdraw(transferAmount);
