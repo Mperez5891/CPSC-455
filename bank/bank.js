@@ -42,16 +42,23 @@ function Account(acctName, acctBalance, type)
 	
 	// Deposits money to the account
 	// @param amount - the amount to deposit
-	Account.prototype.deposit = function(amount) { this.acctBalance  = Math.trunc((parseFloat(this.acctBalance) +  parseFloat(amount)) * 100) / 100; }		//changed to protype / trunc'd the total / changed to float
+	Account.prototype.deposit = function(amount) { 
+		let totalBalance = parseFloat(this.acctBalance) +  parseFloat(amount)								// created variable totalBalance to return 2 decimal places only
+		this.acctBalance  = Math.trunc(totalBalance * 100) / 100; 											//changed to protype / trunc'd the total / changed to float
+	}
 	
 	// Withdraws money from the account
 	// @param amount - the amount to withdraw
-	Account.prototype.withdraw = function(amount){ 
-		if(amount < this.acctBalane) {
-			this.acctBalance = Math.trunc((parseFloat(this.acctBalance) - parseFloat(amount)) * 100) / 100;			//changed to protype / trunc'd the total / changed to float
+	Account.prototype.withdraw = function(amount){
+		let newBalance = this.acctBalance 																	// created a variable for this.acctBalance
+		if(amount <= newBalance) 
+		{
+			let totalBalance = parseFloat(this.acctBalance) - parseFloat(amount);							// created variable totalBalance to return 2 decimal places only
+			this.acctBalance = Math.trunc(totalBalance * 100) / 100;										//changed to protype / trunc'd the total / changed to float
 		}
-		else {
-			console.log("Insufficient Funds \n");
+		else 
+		{
+			console.log("\n **Insufficient Funds**\n");
 		}
 	}
 	// Prints the account information
@@ -111,7 +118,7 @@ function Bank(name, initCustomerList)
 	this.customers = {};
 	
 	// The welcome banner ad!
-	for(let i = 0; i < 3; i++)
+	for(let i = 0; i < 3; i++)											// changed var to let
 	{
 		console.log("Welcome to ", name, "!\n");
 	}
@@ -140,7 +147,7 @@ function Bank(name, initCustomerList)
 	Bank.prototype.createAndAddCustomer = function(userName, userPassword)								//changed to prototype
 	{
 		// Create a new customer
-		let customer = new Customer(userName, userPassword);	
+		let customer = new Customer(userName, userPassword);											// changed var to let
 		
 		// Save the customer
 		this.customers[customer.getUserName()] = customer;
@@ -488,7 +495,7 @@ function Bank(name, initCustomerList)
 		{
 			// Get the account choice
 			accountIndex = readline.question("Please select an account by entering a choice (e.g., enter 1 for the first account) ");
-			accountIndex = parseInt(accountIndex);
+			accountIndex = Math.trunc(parseInt(accountIndex) * 100) / 100;												// if input is 3 decimal place then changes to only 2
 			
 			if(accountIndex > 0 && accountIndex <= user.accounts.length)
 				break;	
@@ -528,20 +535,30 @@ function Bank(name, initCustomerList)
 		this.viewAccounts(customer);
 		
 		// Get the account choice
-		let accountIndex = readline.question("Please select an account by entering a choice (e.g., enter 1 for the first account) ");
+		let accountIndex = 0;								
+		while(true)																						//created while loop to prevent crash if wrong input 
+		{
+			accountIndex = readline.question("Please select an account by entering a choice (e.g., enter 1 for the first account) ");
+			accountIndex = parseInt(accountIndex);
+			
+			if(accountIndex > 0 && accountIndex <= customer.accounts.length)
+				break;
+			else
+				console.log("Invalid input. Try again.");
+		}
 		
 		// Get the account based on index
-		let account = customer.getAccount(accountIndex - 1);	
+		let account = customer.getAccount(accountIndex - 1);					
 		
 		// make sure withdraw amount is > 0 and a number
 		// we are allowing the user to withdraw more than they have to 
 		// charage them overdraft fees
 		let withdrawAmount = 0;
-		while(true)
+		while(true)																						//created while loop to prevent wrong input
 		{
 			// Get the withdraw amount
 			withdrawAmount = readline.question("Please enter the withraw amount: ");
-			withdrawAmount = parseFloat(withdrawAmount);
+			withdrawAmount = Math.trunc(parseFloat(withdrawAmount) * 100) / 100;									// if input is 3 decimal place then changes to only 2
 			if(withdrawAmount > 0)
 				break;
 			else
@@ -567,13 +584,31 @@ function Bank(name, initCustomerList)
 		this.viewAccounts(customer);
 			
 		// Get the source account
-		let accountIndex = readline.question("Please select the source account by entering a choice (e.g., enter 1 for the first account) ");
-		
+		let accountIndex = 0;
+		while(true)
+		{
+			accountIndex = readline.question("Please select the source account by entering a choice (e.g., enter 1 for the first account) ");
+			accountIndex = parseInt(accountIndex);
+			
+			if(accountIndex > 0 && accountIndex <= customer.accounts.length)
+				break;
+			else
+				console.log("Not a valid input. Try again");
+		}
 		// Get the destination account based on index
 		let srcAccount = customer.getAccount(accountIndex - 1);
 		
 		// Get the destination account
-		accountIndex = readline.question("Please select the destination by entering a choice (e.g., enter 1 for the first account) ");
+		while(true)
+		{
+			accountIndex = readline.question("Please select the destination by entering a choice (e.g., enter 1 for the first account) ");
+			accountIndex = parseInt(accountIndex);
+			
+			if(accountIndex > 0 && accountIndex <= customer.accounts.length)
+				break;
+			else
+				console.log("Not a valid input. Try again");
+		}
 		
 		// Get the destination account based on index
 		let dstAccount = customer.getAccount(accountIndex - 1);		
@@ -600,12 +635,12 @@ function Bank(name, initCustomerList)
 	Bank.prototype.showAccounts = function(user)
 	{
 		// Get the accounts
-		let accounts = user.getAccounts();
+		let accounts = user.getAccounts();						// changed var to let
 		
 		console.log(accounts);
 			
 		// The account number
-		let acctNum = 0;
+		let acctNum = 0;										// changed var to let
 		
 		// Print all the accounts
 		for(account of accounts)
@@ -640,9 +675,9 @@ function Bank(name, initCustomerList)
 // ---- Sample Test Code --------
 
 // Create three customers
-var c1 = new Customer("mike", "123");
-var c2 = new Customer("pike", "234");
-var c3 = new Customer("bike", "678");
+let c1 = new Customer("mike", "123");							// changed var to let
+let c2 = new Customer("pike", "234");							// changed var to let
+let c3 = new Customer("bike", "678");							// changed var to let
 
 // Add accounts to each customer
 c1.addAccount(new Account("bills", 100, "savings"));
@@ -655,9 +690,9 @@ c3.addAccount(new Account("chills", 300, "savings"));
 c3.addAccount(new Account("thrills", 400, "checking"));
 
 // Create a list of customers
-var customers = [c1, c2, c3];
+let customers = [c1, c2, c3];									//changed var to let
 
 // Create a bank object
-var myBank = new Bank("Kitty Bank", customers);
+let myBank = new Bank("Kitty Bank", customers);					// changed var to let
 
 myBank.start();
