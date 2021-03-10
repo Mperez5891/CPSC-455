@@ -82,7 +82,7 @@ function Customer(userName, userPassword)
 	this.userPassword = userPassword;
 	
 	// The list of accounts	
-	this.accounts = []														//moved this.accounts above prototype inside Customer() function
+	this.accounts = []																						//moved this.accounts above prototype inside Customer() function
 }
 	
 	// Returns the username
