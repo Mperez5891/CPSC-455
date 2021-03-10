@@ -29,7 +29,7 @@ function Account(acctName, acctBalance, type)
 
 	// The account type
 	this.type = type;
-}																	//moved curly brackets before prototypes
+}																											//moved curly brackets before prototypes
 
 	// Returns the account name
 	Account.prototype.getAcctName = function() { return this.acctName; }									//changed to protype
@@ -49,7 +49,8 @@ function Account(acctName, acctBalance, type)
 	
 	// Withdraws money from the account
 	// @param amount - the amount to withdraw
-	Account.prototype.withdraw = function(amount){
+	Account.prototype.withdraw = function(amount) 
+	{
 		let newBalance = this.acctBalance 																	// created a variable for this.acctBalance
 		if(amount <= newBalance) 
 		{
