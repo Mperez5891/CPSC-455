@@ -359,7 +359,7 @@ function Bank(name, initCustomerList)
 			else if (choice === 2)
 				this.createCustomerUI();
 
-		}while(choice != 1 && choice != 2);
+		}while(choice !== 1 && choice !== 2);
 	}
 	
 	// -------------------------------------------------------------
