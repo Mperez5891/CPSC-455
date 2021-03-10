@@ -497,7 +497,7 @@ function Bank(name, initCustomerList)
 		{
 			// Get the account choice
 			accountIndex = readline.question("Please select an account by entering a choice (e.g., enter 1 for the first account) ");
-			accountIndex = Math.trunc(parseInt(accountIndex) * 100) / 100;												// if input is 3 decimal place then changes to only 2
+			accountIndex = parseInt(accountIndex);																														// if input is 3 decimal place then changes to only 2
 			
 			if(accountIndex > 0 && accountIndex <= user.accounts.length)
 				break;	
