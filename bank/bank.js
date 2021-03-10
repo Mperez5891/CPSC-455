@@ -119,13 +119,13 @@ function Bank(name, initCustomerList)
 	this.customers = {};
 	
 	// The welcome banner ad!
-	for(let i = 0; i < 3; i++)											// changed var to let
+	for(let i = 0; i < 3; i++)																// changed var to let
 	{
 		console.log("Welcome to ", name, "!\n");
 	}
 		
 	// Initialize the customer map
-	let i = 0;															// initialized let i = 0
+	let i = 0;																				// initialized let i = 0
 	while(i < initCustomerList.length)													
 	{
 		// Get the customer
@@ -136,7 +136,7 @@ function Bank(name, initCustomerList)
 		// Next user!	
 		i += 1;	
 	}
-}																		//moved curly bracket above prototypes
+}																							//moved curly bracket above prototypes
 	
 	// -------------------------------------------------------------
 	// Creates a new user with the specified user name and password.
