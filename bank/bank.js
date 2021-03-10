@@ -175,9 +175,9 @@ function Bank(name, initCustomerList)
 	// The user action selection menu
 	// @param customer - the customer 
 	// -----------------------------------------------
-	Bank.prototype.userActionMenuUI = function(customer)										// changed to a prototype
+	Bank.prototype.userActionMenuUI = function(customer)												// changed to a prototype
 	{
-		let choice = null;												//initialized choice to insure another choice option
+		let choice = null;																				//initialized choice to insure another choice option
 		do
 		{
 			// Get the user input and create a customer object
@@ -192,10 +192,11 @@ function Bank(name, initCustomerList)
 			console.log("-----------------------------------------------\n\n");
 
 			// Accept input
-			choice = readline.question("Choice: ");										//removed var
+			choice = readline.question("Choice: ");														//removed var
 			
 			//checks if inputs are valid and numbers 1-6
-			while(isNaN(choice) || !isFinite(choice) || !Number.isInteger(parseFloat(choice)) || parseInt(choice) <= 0 || parseInt(choice) > 7)			// created a while loop to check for valid numbers only
+			while(isNaN(choice) || !isFinite(choice) || !Number.isInteger(parseFloat(choice)) 
+					|| parseInt(choice) <= 0 || parseInt(choice) > 7)									// created a while loop to check for valid numbers only
 			{
 				console.log("-----------------------------------------------");
 				console.log("1. Deposit");
@@ -214,9 +215,9 @@ function Bank(name, initCustomerList)
 			// Decide what to do
 			
 			// Deposit	
-			if(parseInt(choice) === 1)															//changed == to === / parseInt()
+			if(parseInt(choice) === 1)																	//changed == to === / parseInt()
 			{
-				if(customer.accounts.length < 1) 												//created an if statement for 0 accounts opened
+				if(customer.accounts.length < 1) 														//created an if statement for 0 accounts opened
 				{
 					console.log("\nYou have 0 active accounts open.");
 					console.log("Please, press 5 to activate a new account. \n");
@@ -228,9 +229,9 @@ function Bank(name, initCustomerList)
 				}
 			}
 			// Withdraw
-			else if(parseInt(choice) === 2)														//changed == to === / parseInt()
+			else if(parseInt(choice) === 2)																//changed == to === / parseInt()
 			{
-				if(customer.accounts.length < 1)												//created an if statement for 0 accounts opened
+				if(customer.accounts.length < 1)														//created an if statement for 0 accounts opened
 				{
 					console.log("\nYou have 0 active accounts open.");
 					console.log("Please, press 5 to activate a new account. \n");
@@ -242,14 +243,14 @@ function Bank(name, initCustomerList)
 				}
 			}
 			// Transfer
-			else if(parseInt(choice) === 3)														//changed == to === / parseInt()
+			else if(parseInt(choice) === 3)																//changed == to === / parseInt()
 			{
-				if(customer.accounts.length === 0)												//created an if statement for 0 accounts opened
+				if(customer.accounts.length === 0)														//created an if statement for 0 accounts opened
 				{
 					console.log("\nYou have 0 active accounts open, need a minimum of 2 accounts.");
 					console.log("Please, press 5 to activate a new account. \n");
 				}
-				else if(customer.accounts.length === 1)											//created an if statement for 1 account opened
+				else if(customer.accounts.length === 1)													//created an if statement for 1 account opened
 				{
 					console.log("\nYou have 1 active account open, need a minimum of 2 accounts.");
 					console.log("Please, press 5 to activate a new account. \n");
@@ -261,9 +262,9 @@ function Bank(name, initCustomerList)
 				}
 			}
 			// View accounts
-			else if(parseInt(choice) === 4)														//changed == to === / parseInt()
+			else if(parseInt(choice) === 4)																//changed == to === / parseInt()
 			{
-				if(customer.accounts.length < 1)												//created an if statement for 0 account opened
+				if(customer.accounts.length < 1)														//created an if statement for 0 account opened
 				{
 					console.log("\nYou have 0 active accounts open.");
 					console.log("Please, press 5 to activate a new account. \n");
@@ -276,15 +277,15 @@ function Bank(name, initCustomerList)
 				
 			}
 			// Open new account
-			else if(parseInt(choice) === 5)														//changed == to === / parseInt()
+			else if(parseInt(choice) === 5)																//changed == to === / parseInt()
 			{
 				console.log("Open New Account");
 				this.openAccountUI(customer);
 			}
 			// Close customer account
-			else if(parseInt(choice) === 6)														//changed == to === / parseInt()
+			else if(parseInt(choice) === 6)																//changed == to === / parseInt()
 			{
-				if(customer.accounts.length < 1)												//created an if statement for 0 account opened
+				if(customer.accounts.length < 1)														//created an if statement for 0 account opened
 				{
 					console.log("\nYou have 0 active accounts open.");
 					console.log("Please, press 5 to activate a new account. \n");
@@ -292,11 +293,11 @@ function Bank(name, initCustomerList)
 				else
 				{
 					console.log("Remove Account");
-					this.closeAccount(customer);													//missing semicolon ;
+					this.closeAccount(customer);														//missing semicolon ;
 				}
 			}
 		}
-		while(parseInt(choice) !== 7);																//changes != to !==
+		while(parseInt(choice) !== 7);																	//changes != to !==
 	}
 	
 	
@@ -329,7 +330,7 @@ function Bank(name, initCustomerList)
 	// ------------------------------------------------------------
 	Bank.prototype.masterChoice = function()														//changed to prototype
 	{
-		let choice = 0;									// choice has to be outside scope to check in do while
+		let choice = 0;																	// choice has to be outside scope to check in do while
 		do
 		{
 			console.log("What would you like to do?");
@@ -340,9 +341,9 @@ function Bank(name, initCustomerList)
 			while(true)
 			{
 				// Get the choice
-				choice = readline.question("Choice: ");	// changed var to let
-				choice = parseInt(choice);				// make sure choice is int 
-				if(choice === 1 || choice === 2)	    // make sure its either 1 or 2
+				choice = readline.question("Choice: ");								// changed var to let
+				choice = parseInt(choice);											// make sure choice is int 
+				if(choice === 1 || choice === 2)	    							// make sure its either 1 or 2
 					break;
 				else
 				{
