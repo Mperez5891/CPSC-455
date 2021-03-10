@@ -466,7 +466,7 @@ function Bank(name, initCustomerList)
 		{
 			// The initial deposit	
 			initialDeposit = readline.question("Please enter the deposit amount: ");
-			initialDeposit = parseFloat(initialDeposit);
+			initialDeposit = Math.trunc(parseFloat(initialDeposit) * 100) / 100;
 			if(initialDeposit > 0)
 				break;
 			else
@@ -619,7 +619,7 @@ function Bank(name, initCustomerList)
 		while(true)
 		{
 			transferAmount = readline.question("Please enter the transfer amount: ");
-			transferAmount = parseInt(transferAmount);
+			transferAmount = Math.trunc(parseFloat(transferAmount) * 100) / 100;
 			
 			if(transferAmount <= srcAccount.acctBalance && transferAmount > 0)
 				break;
@@ -686,7 +686,8 @@ function Bank(name, initCustomerList)
 			accountIndex2 = readline.question("Please select which account to transfer the remaining funds (e.g., enter 1 for the first account): ");
 		
 			// Check that the user input a valid account and not the same account they're trying to remove.
-			while(isNaN(accountIndex2) || !isFinite(accountIndex2) || !Number.isInteger(parseFloat(accountIndex2)) || parseInt(accountIndex2) <= 0 || parseInt(accountIndex) === parseInt(accountIndex2) || parseInt(accountIndex2) > (customer.accounts.length))
+			while(isNaN(accountIndex2) || !isFinite(accountIndex2) || !Number.isInteger(parseFloat(accountIndex2)) || parseInt(accountIndex2) <= 0 
+					|| parseInt(accountIndex) === parseInt(accountIndex2) || parseInt(accountIndex2) > (customer.accounts.length))
 			{
 				if(Number.isInteger(parseFloat(accountIndex2)) && parseInt(accountIndex2) === parseInt(accountIndex))
 				{
