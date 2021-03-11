@@ -713,7 +713,7 @@ function Bank(name, initCustomerList)
 		this.viewAccounts(customer);
 		if (customer.accounts.length <= 1) 
 		{
-			console.log("Careful, you are about to delete your last account!");
+			console.log("You just deleted your last account! Thank you for your money :p ");
 		}
 	
 		// Removes the account from list of accounts
