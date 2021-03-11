@@ -367,8 +367,8 @@ function Bank(name, initCustomerList)
 	// -------------------------------------------------------------
 	Bank.prototype.loginUI = function()
 	{
-		let match = false;											// match has to be outside scope to use in do
-		let userName = '';											// username has to be out of scope too
+		let match = false;															// match has to be outside scope to use in do
+		let userName = '';															// username has to be out of scope too
 		do
 		{
 			console.log("Please enter your user name and password");
@@ -377,14 +377,14 @@ function Bank(name, initCustomerList)
 			userName = readline.question("Username: ");			
 	
 			// Get the password	
-			let userPassword = readline.question("Password: ");		// change var to let
+			let userPassword = readline.question("Password: ");						// change var to let
 				
 			// Whether there was a match
 			match = this.login(userName, userPassword);	
 		} while(!match);
 		
 		// Get the customer
-		let customer = this.getCustomer(userName);					// change var to let
+		let customer = this.getCustomer(userName);									// change var to let
 		
 		// Show the user menu
 		this.userActionMenuUI(customer);
@@ -399,13 +399,13 @@ function Bank(name, initCustomerList)
 	Bank.prototype.login = function(userName, userPassword)
 	{		
 		// The match
-		let match = false;										// change var to let
+		let match = false;															// change var to let
 		
 		// Is this a registered user?
 		if(userName in this.customers)
 		{
 			// Get the customer
-			let customer = this.customers[userName];			// change var to let
+			let customer = this.customers[userName];								// change var to let
 			
 			// Check the password
 			if(customer.getPassword() == userPassword) { match = true; }
