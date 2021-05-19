@@ -1,0 +1,48 @@
+1. sudo apt-get install mariadb-server
+2.1 Once the installation completes run: sudo service mariadb start
+
+2. sudo mysql_secure_installation
+3. Press enter when prompted for the current root password
+4. Provide a new root password
+5. Retype the root password
+6. Answer "Yes" to all questions
+7. Connect to the DB from command line as root user:
+
+   sudo mysql -u root -p
+
+8. Provide the root password
+9. Create a database called "bankDB"
+
+CREATE DATABASE bankDB;
+
+10. Switch to the "bankDB" database
+
+USE bankDB;
+
+11. Create the tables within database
+
+CREATE TABLE users(
+    userID INT NOT NULL AUTO_INCREMENT,
+    userName VARCHAR(25) NOT NULL,
+    password VARCHAR(25) NOT NULL,
+    PRIMARY KEY(userID)
+     );
+
+CREATE TABLE userAccounts(
+    userID INT NOT NULL,
+    accountNmae VARCHAR(25) NOT NULL,
+    amount FLOAT NOT NULL
+    );
+
+12. insert a test user into table
+INSERT INTO users VALUES('', 'testusername', 'testpassword');
+
+13. Create a user account (appaccount) that will be used by our node.js application to 
+    access the "users" database and give it priveleges to access all tables in the "users" 
+    database:
+
+GRANT ALL PRIVILEGES ON bankDB.* TO 'appaccount'@'localhost' IDENTIFIED BY 'apppass';
+
+14. Exit from the root session:
+
+    exit 
