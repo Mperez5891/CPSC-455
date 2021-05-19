@@ -6,7 +6,8 @@ const fs = require('fs');
 
 // Needed to parse the request body
 const bodyParser = require("body-parser");
-const path = require('path')
+const path = require('path');
+const { nextTick } = require('process');
 const app     = express();
 
 // Needed to parse the request body
@@ -45,8 +46,8 @@ app.get("/", function(req, res){
 // @param req - the request
 // @param res - the response 
 app.post("/login", function(req, res){
-			
-	
+
+	res.sendFile(path.join(__dirname + '/login.html'))
 
 });
 
