@@ -37,7 +37,7 @@ CREATE TABLE userAccounts(
     );
 
 12. Insert a test user into table
-INSERT INTO users VALUES('', 'testusername', 'testpassword');
+INSERT INTO users VALUES('', 'testusername', 'testpassword', 'testname', 'testaddress');
 
 13. Insert a test user account into userAccount table
 INSERT INTO userAccounts VALUES(1, 'testaccountname', 0);
