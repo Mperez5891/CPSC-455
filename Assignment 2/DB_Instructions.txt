@@ -22,9 +22,11 @@ USE bankDB;
 11. Create the tables within database
 
 CREATE TABLE users(
-    userID INT NOT NULL AUTO_INCREMENT,
-    userName VARCHAR(25) NOT NULL,
+    userID INT AUTO_INCREMENT,
+    userName VARCHAR(25) UNIQUE NOT NULL,
     password VARCHAR(25) NOT NULL,
+    name VARCHAR(25) NOT NULL,
+    address VARCHAR(50) NOT NULL,
     PRIMARY KEY(userID)
      );
 

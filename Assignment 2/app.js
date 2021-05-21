@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   cookieName: 'mysession',
   secret: '0GBlJZ9EKBt2Zbi2flRPvztczCewBxXK',
-  duration: 30000,
+  duration: 180000,
   activeDuration: 5 * 60 * 1000,
   httponly: true
 }));
