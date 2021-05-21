@@ -22,10 +22,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Basic cookie configuration
 app.use(session({
-  cookieName: 'session',
-  secret: 'random_string_goes_here',
-  duration: 30 * 60 * 1000,
+  cookieName: 'mysession',
+  secret: '0GBlJZ9EKBt2Zbi2flRPvztczCewBxXK',
+  duration: 30000,
   activeDuration: 5 * 60 * 1000,
+  httponly: true
 }));
 
 // Create the connection to your DB
@@ -55,12 +56,19 @@ function parseDB(dbFile)
 // @param req - the request
 // @param res - the response
 app.get("/", function(req, res){
-	
-	// Read the file	
-	res.sendFile(path.join(__dirname+ '/index.html'));
-	
-});
 
+	if(req.mysession.loggedin)
+	// Is this user logged in?
+	{
+		console.log("You're in");
+		res.redirect('/dashboard');	
+	}
+	else
+	{
+		// Login required	
+		res.sendFile(path.join(__dirname+ '/index.html'));
+	}
+});
 
 // The handler for the request of the login page
 // @param req - the request
@@ -78,8 +86,7 @@ app.post('/login', function(req, res) {
 	// Query the DB for the user
 	mysqlConn.query(query, function(err, qResult){
 					
-		if(err) throw err;
-					
+		if(err) throw err;		
 		console.log(qResult[1]);	
 		
 		// Does the password match?
@@ -96,7 +103,6 @@ app.post('/login', function(req, res) {
 				match = true;
 				
 				//break;
-				
 			}
 		});
 
@@ -104,15 +110,29 @@ app.post('/login', function(req, res) {
 		// to the dashboard
 		if(match)
 		{
-			req.session.username = userName;
+			// update the cookie
+			let randomNumber=Math.random().toString();
+			randomNumber=randomNumber.substring(2,randomNumber.length);
+			
+			req.mysession.loggedin = randomNumber;
 			res.redirect('/dashboard');
 		}
 		else
 		{
 			// If no matches have been found, we are done
-			res.send("<b>Wrong</b>");				
+			res.send("<b>Failed authentication</b>");				
 		}
 	});
+});
+
+// The end-point for logging out
+app.post("/logout", function(req, res){
+
+	// Kill the session
+	req.mysession.reset();
+	console.log("Session Cleared!");
+	res.redirect('/');
+	
 });
 
 // The end-point for creating an account
