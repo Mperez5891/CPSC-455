@@ -23,7 +23,7 @@ USE bankDB;
 
 CREATE TABLE users(
     userID INT NOT NULL AUTO_INCREMENT,
-    userName VARCHAR(25) NOT NULL,
+    userName VARCHAR(25) UNIQUE NOT NULL,
     password VARCHAR(25) NOT NULL,
     PRIMARY KEY(userID)
      );
