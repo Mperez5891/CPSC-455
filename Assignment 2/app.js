@@ -135,11 +135,15 @@ app.post("/logout", function(req, res){
 	
 });
 
+app.post("/login", function(req, res){
+
+	res.sendFile(path.join(__dirname + '/login.html'))
+
+});
+
 // The end-point for creating an account
 app.post("/create", function(req, res){
 
-
-	
 });
 
 
