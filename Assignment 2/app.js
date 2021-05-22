@@ -142,18 +142,35 @@ app.post("/create", function(req, res){
 
 });
 
-app.get("/results", function(req, res){
+
+//Creating an endpoint to send JSON object with data
+app.get("/jsonData", function(req,res){
 
   let name = "test json first and last name";
   let accNum = "test json 12345";
   let totBal = "test json $10.00";
 
   //write json object into .json file
-  let o = {11:"a", 22:"b",33:"c"};
+  let o = {"val1":name, "val2":accNum,"val3":totBal};
+
+  //create internal json file to allow programmer to view 
   let jsonO = JSON.stringify(o, null, 2);
   fs.writeFileSync('accountData.json',jsonO);
 
-  //res.json(o);
+  //respond with json file
+  res.json(o);
+
+});
+
+//can look at JSON Data
+app.get("/displayJSONData", function(req, res){
+
+  res.sendFile(__dirname + "/displayJData.html");
+});
+
+app.get("/results", function(req, res){
+
+
   res.sendFile(__dirname + "/results.html");
 
 

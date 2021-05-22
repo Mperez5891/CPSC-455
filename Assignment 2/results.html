@@ -8,17 +8,14 @@
         <h1 style = "text-align: centered; font-size: 40px; border-style: double dashed; border-color: red;"> WELCOME TO SECURE BANKING WITH BANK.JS </h1>
         <h2> Customer Information: </h2>
 
-        <!-- <h3>Account: <span class="account-id"></span></h3> -->
-
-        <!-- <h3>Balance: $<span class="account-bal"></span></h4> -->
 
         <div class="functions">
 
-          <p id="name">Name</p>
-          <p id="acct">Account Number</p>
-          <p id="bal">Total Balance</p>
-          <p id="dep">Deposit Money Button</p>
-          <p id="with">Withdaw Money Button</p>
+          <p id="name"></p>
+          <p id="acct"></p>
+          <p id="bal"></p>
+          <p id="dep"></p>
+          <p id="with"></p>
 
         </div>
 
@@ -35,23 +32,56 @@
 
         <script>
 
-          let jsonData = '';
-          //get data from json file
-          /*fetch("accountData.json")
-            .then(response=> response.json()){
+          //hard coding data
+          //let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
 
+          let objValues = '';
+
+            fetch("http://localhost:3000/jsonData")
+              .then(function(response) {
+                return response.json();
+              })
+              .then(function(values) {
+                console.log(values);
+                console.log(values.val1);
+
+                let objValues = values;
+
+                document.getElementById('name').innerHTML
+                    = "Name: " + objValues.val1;
+
+                document.getElementById('acct').innerHTML
+                    = "Account Number: " + objValues.val2;
+
+                document.getElementById('bal').innerHTML
+                    = "Total Balance: " + objValues.val3;
+
+                document.getElementById('dep').innerHTML
+                    = "Deposit Money Form";
+
+                document.getElementById('with').innerHTML
+                    = "Withdraw Money Form";
+
+        });
+
+          /*
+          fetch('accountData.json').then(function(response){
+              return response.json();
+          }).then(function(obj){
+                console.log(obj);
+          }).catch(function(error){
+                console.error('Error!!!');
+                console.error(error);
+          });
 
           */
-
-
-          let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
-
-
-          document.getElementById('name').innerHTML = "Name: " + val.name;
-          document.getElementById('acct').innerHTML = "Account Number: " + val.aNum;
-          document.getElementById('bal').innerHTML = "Total Balance: " + val.tBal;
-          document.getElementById('dep').innerHTML = "Deposit Money";
-          document.getElementById('with').innerHTML = "Withdraw Money";
+        /*
+          fetch("testFile.json")
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            });
+        */
 
         </script>
 
