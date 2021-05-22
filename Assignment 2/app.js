@@ -18,13 +18,13 @@ const app     = express();
 // Needed to parse the request body
 //Note that in version 4 of express, express.bodyParser() was
 //deprecated in favor of a separate 'body-parser' module.
-app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Basic cookie configuration
 app.use(session({
   cookieName: 'mysession',
   secret: '0GBlJZ9EKBt2Zbi2flRPvztczCewBxXK',
-  duration: 180000,
+  duration: 30000,
   activeDuration: 5 * 60 * 1000,
   httponly: true
 }));
@@ -35,7 +35,7 @@ const  mysqlConn = mysql.createConnection({
 	user: "appaccount",
 	password: "apppass",
 	multipleStatements: true
-	
+
 });
 
 // Parses a database of usernames and passwords
@@ -45,10 +45,10 @@ function parseDB(dbFile)
 {
 	// Read the file
 	fs.readFile(dbFile, "utf8", function(error, data){
-		
+
 		console.log(data);
 		data.split(";");
-		
+
 	});
 }
 
@@ -61,47 +61,47 @@ app.get("/", function(req, res){
 	// Is this user logged in?
 	{
 		console.log("You're in");
-		res.redirect('/dashboard');	
+		res.redirect('/dashboard');
 	}
 	else
 	{
-		// Login required	
+		// Login required
 		res.sendFile(path.join(__dirname+ '/index.html'));
 	}
 });
 
 // The handler for the request of the login page
 // @param req - the request
-// @param res - the response 
+// @param res - the response
 app.post('/login', function(req, res) {
 
 	// Get the username and password data from the form
 	let userName = req.body.username;
 	let password = req.body.password;
-	
+
 	// Construct the query
-	let query = "USE bankDB; SELECT username,password from users where userName='" + userName + "' AND password='" + password + "'"; 
-	console.log(query);	
-				
+	let query = "USE bankDB; SELECT username,password from users where userName='" + userName + "' AND password='" + password + "'";
+	console.log(query);
+
 	// Query the DB for the user
 	mysqlConn.query(query, function(err, qResult){
-					
-		if(err) throw err;		
-		console.log(qResult[1]);	
-		
+
+		if(err) throw err;
+		console.log(qResult[1]);
+
 		// Does the password match?
 		let match = false;
-			
+
 		// Go through the results of the second query
 		qResult[1].forEach(function(account){
-			
+
 			if(account['username'] == userName && account['password'] == password)
 			{
 				console.log("Match!");
-				
+
 				// We have a match!
 				match = true;
-				
+
 				//break;
 			}
 		});
@@ -113,14 +113,14 @@ app.post('/login', function(req, res) {
 			// update the cookie
 			let randomNumber=Math.random().toString();
 			randomNumber=randomNumber.substring(2,randomNumber.length);
-			
+
 			req.mysession.loggedin = randomNumber;
 			res.redirect('/dashboard');
 		}
 		else
 		{
 			// If no matches have been found, we are done
-			res.send("<b>Failed authentication</b>");				
+			res.send("<b>Failed authentication</b>");
 		}
 	});
 });
@@ -132,17 +132,31 @@ app.post("/logout", function(req, res){
 	req.mysession.reset();
 	console.log("Session Cleared!");
 	res.redirect('/');
-	
-});
-
-app.post("/login", function(req, res){
-
-	res.sendFile(path.join(__dirname + '/login.html'))
 
 });
 
 // The end-point for creating an account
 app.post("/create", function(req, res){
+
+
+
+});
+
+app.get("/results", function(req, res){
+
+  let name = "test json first and last name";
+  let accNum = "test json 12345";
+  let totBal = "test json $10.00";
+
+  //write json object into .json file
+  let o = {11:"a", 22:"b",33:"c"};
+  let jsonO = JSON.stringify(o, null, 2);
+  fs.writeFileSync('accountData.json',jsonO);
+
+  //res.json(o);
+  res.sendFile(__dirname + "/results.html");
+
+
 
 });
 
