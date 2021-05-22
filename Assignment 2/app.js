@@ -160,6 +160,94 @@ app.get("/results", function(req, res){
 
 });
 
+// HELPER FUNCTIONS //////////////////////////////////
+// Deposits money in the account named
+// @param accountName - the name of the account to deposit in
+// @param amount - amount to deposit
+function deposit(accountName, amount)
+{
+	// Construct the query to get amount
+	let query = "USE bankDB; SELECT amount FROM userAccounts WHERE accountName = '" + accountName + "'"; 
+	console.log(query);
+	
+	let currentBalance = 0;
+	
+	// Query the DB for the user
+	mysqlConn.query(query, function(err, qResult){
+		if(err) throw err;		
+		console.log(qResult[1]);	
+			
+		// Go through the results of the second query
+		qResult[1].forEach(function(account){
+			currentBalance = account['amount']
+			console.log(currentBalance);
+			
+			// Base case
+			if(amount <= 0)
+				return;
+			else
+			{
+				// Calculate new balance
+				currentBalance += amount;
+				
+				// Update DB
+				// Construct the query to get amount
+				let query = "USE bankDB; UPDATE userAccounts SET amount = " + currentBalance + " WHERE accountName = '" + accountName + "'"; 
+				console.log(query);
+			
+				// Update amount
+				mysqlConn.query(query, function(err, result){
+					if(err) throw err;		
+					console.log('Deposit complete!');	
+				});
+			}
+		});
+    });
+}
+
+// Withdraw money in the account named
+// @param accountName - the name of the account to deposit in
+// @param amount - amount to deposit
+function withdraw(accountName, amount)
+{
+	// Construct the query to get amount
+	let query = "USE bankDB; SELECT amount FROM userAccounts WHERE accountName = '" + accountName + "'"; 
+	console.log(query);
+	
+	let currentBalance = 0;
+	
+	// Query the DB for the user
+	mysqlConn.query(query, function(err, qResult){
+		if(err) throw err;		
+		console.log(qResult[1]);	
+			
+		// Go through the results of the second query
+		qResult[1].forEach(function(account){
+			currentBalance = account['amount']
+			console.log(currentBalance);
+			
+			// Base case
+			if(amount <= 0 || amount > currentBalance)
+				return;
+			else
+			{
+				// Calculate new balance
+				currentBalance -= amount;
+				
+				// Update DB
+				// Construct the query to get amount
+				let query = "USE bankDB; UPDATE userAccounts SET amount = " + currentBalance + " WHERE accountName = '" + accountName + "'"; 
+				console.log(query);
+			
+				// Update amount
+				mysqlConn.query(query, function(err, result){
+					if(err) throw err;		
+					console.log('Withdraw complete!');	
+				});
+			}
+		});
+    });
+}
 
 
 app.listen(3000);
