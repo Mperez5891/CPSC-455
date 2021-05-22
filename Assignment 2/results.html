@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+    <title>Bank_Account.js</title>
+
+    <body style = "background-color: lightblue;">
+
+        <h1 style = "text-align: centered; font-size: 40px; border-style: double dashed; border-color: red;"> WELCOME TO SECURE BANKING WITH BANK.JS </h1>
+        <h2> Customer Information: </h2>
+
+        <!-- <h3>Account: <span class="account-id"></span></h3> -->
+
+        <!-- <h3>Balance: $<span class="account-bal"></span></h4> -->
+
+        <div class="functions">
+
+          <p id="name">Name</p>
+          <p id="acct">Account Number</p>
+          <p id="bal">Total Balance</p>
+          <p id="dep">Deposit Money Button</p>
+          <p id="with">Withdaw Money Button</p>
+
+        </div>
+
+        <h2> Customer Account Management </h2>
+        <div class="alert alert-info text-center">
+            <p> <a href="/transfer"> Transfer Money To Another Account </a><p>
+
+            <p> <a href="/next-account"> Go to next account </a> </p>
+
+            <p> <a href="/new-account"> Create New Account </a> </p>
+
+        </div>
+
+
+        <script>
+
+          let jsonData = '';
+          //get data from json file
+          /*fetch("accountData.json")
+            .then(response=> response.json()){
+
+
+          */
+
+
+          let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
+
+
+          document.getElementById('name').innerHTML = "Name: " + val.name;
+          document.getElementById('acct').innerHTML = "Account Number: " + val.aNum;
+          document.getElementById('bal').innerHTML = "Total Balance: " + val.tBal;
+          document.getElementById('dep').innerHTML = "Deposit Money";
+          document.getElementById('with').innerHTML = "Withdraw Money";
+
+        </script>
+
+
+    </body>
+
+</html>
