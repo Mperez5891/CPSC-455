@@ -153,7 +153,7 @@ app.get("/jsonData", function(req,res){
   //write json object into .json file
   let o = {"val1":name, "val2":accNum,"val3":totBal};
 
-  //create internal json file to allow programmer to view 
+  //create internal json file to allow programmer to view
   let jsonO = JSON.stringify(o, null, 2);
   fs.writeFileSync('accountData.json',jsonO);
 
@@ -173,10 +173,40 @@ app.get("/results", function(req, res){
 
   res.sendFile(__dirname + "/results.html");
 
+});
 
+app.post("/deposit", function(req, res){
+
+  res.sendFile(__dirname + "/deposit.html");
+});
+
+app.post("/withdraw", function(req, res){
+
+  res.sendFile(__dirname + "/withdraw.html");
+});
+
+app.get("/transfer", function(req, res){
+
+  res.sendFile(__dirname + "/transfer.html");
 
 });
 
+app.get("/transfer", function(req, res){
 
+  res.sendFile(__dirname + "/transfer.html");
+
+});
+
+app.get("/nextAccount", function(req, res){
+
+    res.send("Work In Progress")
+
+});
+
+app.get("/addAccount", function(req, res){
+
+  res.send("Work In Progress")
+
+});
 
 app.listen(3000);
