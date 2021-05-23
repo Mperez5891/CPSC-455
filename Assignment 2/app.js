@@ -15,6 +15,9 @@ const bodyParser = require("body-parser");
 const path = require('path')
 const app     = express();
 
+// Needed for security
+const xssFilters = require('xss-filers');
+
 // Needed to parse the request body
 //Note that in version 4 of express, express.bodyParser() was
 //deprecated in favor of a separate 'body-parser' module.
