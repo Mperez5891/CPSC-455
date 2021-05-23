@@ -55,6 +55,136 @@ function parseDB(dbFile)
 	});
 }
 
+// HELPER FUNCTIONS //////////////////////////////////////////////////
+// Deposits money in the account named
+// @param accountName - the name of the account to deposit in
+// @param amount - amount to deposit
+function deposit(userName, accountName, amount)
+{
+	// Construct the query to get amount
+	let query = "SELECT amount FROM userAccounts "
+	+ "JOIN users ON users.userID = userAccounts.userID "
+	+ "WHERE users.userName = '" + userName + "' AND accountName = '" + accountName + "'";
+	let currentBalance = 0;
+
+	// Query the DB for the user
+	try{
+		mysqlConn.query(query, function(err, results){
+			if(err) throw err;
+			try{
+				currentBalance = results[0].amount;
+
+				// Base case
+				if(amount <= 0)
+					throw err;
+				else
+				{
+					// Calculate new balance
+					currentBalance += amount;
+
+					// Update DB
+					// Construct the query to get amount
+					let query = "USE bankDB; UPDATE userAccounts "
+					+ "JOIN users ON users.userID = userAccounts.userID "
+					+ "SET amount = " + currentBalance
+					+ " WHERE users.userName = '" + userName + "' AND accountName = '"
+					+ accountName + "'";
+
+					// Update amount
+					mysqlConn.query(query, function(err, result){
+						if(err) throw err;
+						console.log('Deposit complete!');
+					});
+				}
+			}
+			catch(err){console.log('Failed deposit');}
+		});
+	}
+	catch(err){console.log('Failed deposit');}
+}
+
+function withdraw(userName, accountName, amount)
+{
+	// Construct the query to get amount
+	let query = "SELECT amount FROM userAccounts "
+	+ "JOIN users ON users.userID = userAccounts.userID "
+	+ "WHERE users.userName = '" + userName + "' AND accountName = '" + accountName + "'";
+	let currentBalance = 0;
+
+	// Query the DB for the user
+	try{
+		mysqlConn.query(query, function(err, results){
+			if(err) throw err;
+			try{
+				currentBalance = results[0].amount;
+
+				// Base case
+				if(amount <= 0 || amount > currentBalance)
+					throw err;
+				else
+				{
+					// Calculate new balance
+					currentBalance -= amount;
+
+					// Update DB
+					// Construct the query to get amount
+					let query = "USE bankDB; UPDATE userAccounts "
+					+ "JOIN users ON users.userID = userAccounts.userID "
+					+ "SET amount = " + currentBalance
+					+ " WHERE users.userName = '" + userName + "' AND accountName = '"
+					+ accountName + "'";
+
+					// Update amount
+					mysqlConn.query(query, function(err, result){
+						if(err) throw err;
+						console.log('Withdraw complete!');
+					});
+				}
+			}
+			catch(err){console.log('Failed withdraw');}
+		});
+	}
+	catch(err){console.log('Failed withdraw');}
+}
+
+function getAccounts(username)
+{
+	return new Promise((resolve, reject)=>{
+		let query = 'USE bankDB; SELECT users.userName, accountName, '
+		+ 'amount FROM userAccounts JOIN users ON users.userID = userAccounts.userID;'
+		mysqlConn.query(query, function(err, results){
+			if(err) return reject(err);
+			else
+			{
+				let s = JSON.stringify(results[1]);
+				let json = JSON.parse(s);
+				resolve(json);
+			}
+		});
+	});
+}
+
+function transferAmount(userName, accountName1, accountName2, amount)
+{
+	return new Promise((resolve, reject)=>{
+		try{
+			withdraw(userName, accountName1, amount);
+		}
+		catch(error)
+		{
+			return reject(error);
+		}
+
+		resolve();
+	})
+
+	.then(function() {
+		deposit(userName, accountName2, amount);
+	})
+	.catch((error) => setImmediate(() => { throw error; }));
+}
+
+
 // The handler for the home page
 // @param req - the request
 // @param res - the response
@@ -230,5 +360,8 @@ app.post("/selectAccount", function(req, res){
   let choice = req.body;
   res.send(choice);
 });
+
+
+
 
 app.listen(3000);

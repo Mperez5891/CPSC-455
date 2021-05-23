@@ -7,6 +7,15 @@
 
         <h1 style = "text-align: centered; font-size: 40px; border-style: double dashed; border-color: red;"> WELCOME TO SECURE BANKING WITH BANK.JS </h1>
 
+        <h2> Customer Information </h2>
+
+          <div class="customerInfo">
+
+            <p id="name"></p>
+
+          </div>
+
+
         <h2> Select Account </h2>
 
         <form id="list" action="http://localhost:3000/selectAccount" method="post">
@@ -17,14 +26,13 @@
           <input type="submit" value="Submit">
         </form>
 
-        <h2> Customer Information </h2>
+
 
 
         <div class="functions">
 
-          <p id="name"></p>
-          <p id="acct"></p>
-          <p id="bal"></p>
+          <p id="acct"> Account Name </p>
+          <p id="bal"> Account Balance </p>
 
         </div>
 
@@ -110,18 +118,12 @@
                     = "Name: " + objValues.val1;
 
                 document.getElementById('acct').innerHTML
-                    = "Account Number: " + objValues.val2;
+                    = "Account Name: " + objValues.val2;
 
                 document.getElementById('bal').innerHTML
                     = "Total Balance: " + objValues.val3;
 
-                document.getElementById('dep').innerHTML
-                    = "Deposit Money Form";
-
-                document.getElementById('with').innerHTML
-                    = "Withdraw Money Form";
-
-
+                //hardcoded array to fill pick list 
                 let arr = ["Account A", "Account B", "Account C", "Account D"];
 
 
