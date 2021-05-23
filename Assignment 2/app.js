@@ -202,9 +202,9 @@ app.post("/withdraw", function(req, res){
   res.sendFile(__dirname + "/withdraw.html");
 });
 
-app.get("/transfer", function(req, res){
-
-  res.sendFile(__dirname + "/transfer.html");
+app.post("/transfer", function(req, res){
+  let choice = req.body;
+  res.send(choice);
 
 });
 

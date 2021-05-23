@@ -48,10 +48,35 @@
         </div>
 
         <h2> Customer Account Management </h2>
-        <div class="alert alert-info text-center">
-            <p> <a href="http://localhost:3000/transfer"> Transfer Money To Another Account </a><p>
+        <h3> Transfer Money To Another Account </h3>
 
-            <p> <a href="http://localhost:3000/nextAccount"> Go to next account </a> </p>
+        <div class="alert alert-info text-center">
+
+
+            <form id="list" action="http://localhost:3000/transfer" method="post">
+
+              <label for="transferFrom"> Transfer From Account </label>
+                <select id="transferFrom" name="transferFrom">
+                    <option>Select Your Account</option>
+                </select>
+
+              <br>
+              <label for="transferTo"> Transfer To Account </label>
+                <select id="transferTo" name="transferTo">
+                    <option>Select Your Account</option>
+                </select>
+
+              <br>
+              <label for="transferAmount">Enter Transfer Amount</label><br>
+                <input type="number" id="tAmt" name="tAmt"
+                  min="0" max="500" step=".01" value=0> <br>
+
+              <input type="submit" value="Submit">
+
+              <br>
+
+            </form>
+
 
             <p> <a href="http://localhost:3000/addAccount"> Add Another Account </a> </p>
 
@@ -80,6 +105,7 @@
 
                 let objValues = values;
 
+
                 document.getElementById('name').innerHTML
                     = "Name: " + objValues.val1;
 
@@ -95,25 +121,34 @@
                 document.getElementById('with').innerHTML
                     = "Withdraw Money Form";
 
-          let option =  document.getElementById('customerAccount')
-          let arr = ["Account A", "Account B", "Account C", "Account D"];
 
-            for (let i=0; i < arr.length; i++){
-              let pickValue = arr[i];
-              let elem = document.createElement("option");
-              elem.text = pickValue;
-              elem.value = pickValue;
-
-              option.appendChild(elem);
-
-            }
-
-        let accountView = document.getElementsByClassName('currentAccount').value;
-        console.log(accountView);
+                let arr = ["Account A", "Account B", "Account C", "Account D"];
 
 
+                //aVal is array of values to fill and param2 is where to placeList
+                function fillSelection(aVal, location){
 
-        });
+                let placeHolder =  document.getElementById(location)
+                  for (let i=0; i < aVal.length; i++){
+                    let pickValue = aVal[i];
+                    let elem = document.createElement("option");
+                    elem.text = pickValue;
+                    elem.value = pickValue;
+
+                    placeHolder.appendChild(elem);
+                  }
+
+                };
+
+                fillSelection(arr,'customerAccount');
+                fillSelection(arr,'transferTo');
+                fillSelection(arr, 'transferFrom');
+
+
+              }).catch(function(error){
+                  console.error(error);
+
+          });
 
           /*
           fetch('accountData.json').then(function(response){
