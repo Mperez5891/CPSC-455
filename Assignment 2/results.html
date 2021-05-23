@@ -6,52 +6,132 @@
     <body style = "background-color: lightblue;">
 
         <h1 style = "text-align: centered; font-size: 40px; border-style: double dashed; border-color: red;"> WELCOME TO SECURE BANKING WITH BANK.JS </h1>
-        <h2> Customer Information: </h2>
 
-        <!-- <h3>Account: <span class="account-id"></span></h3> -->
+        <h2> Select Account </h2>
 
-        <!-- <h3>Balance: $<span class="account-bal"></span></h4> -->
+        <form id="list" action="http://localhost:3000/selectAccount" method="post">
+          <label for="customerAccount">Pick An Account</label>
+            <select id="customerAccount" name="customerAccount">
+                <option>Select Your Account</option>
+            </select>
+          <input type="submit" value="Submit">
+        </form>
+
+        <h2> Customer Information </h2>
+
 
         <div class="functions">
 
-          <p id="name">Name</p>
-          <p id="acct">Account Number</p>
-          <p id="bal">Total Balance</p>
-          <p id="dep">Deposit Money Button</p>
-          <p id="with">Withdaw Money Button</p>
+          <p id="name"></p>
+          <p id="acct"></p>
+          <p id="bal"></p>
+
+        </div>
+
+        <div class="transactions">
+
+          <form action="http://localhost:3000/deposit" method="post">
+              <label for="deposit">Enter Deposit Amount</label><br>
+              <input type="number" id="dep" name="amt"
+                min="0" max="500" step=".01" value=0> <br>
+              <input type="submit" value="submit"><br><br>
+          </form>
+
+          <form action="http://localhost:3000/withdraw" method="post">
+              <label for="deposit">Enter Withdraw Amount</label><br>
+              <input type="number" id="with" name="amt"
+                min="0" max="500" step=".01" value=0> <br>
+              <input type="submit" value="submit"><br><br>
+          </form>
+
 
         </div>
 
         <h2> Customer Account Management </h2>
         <div class="alert alert-info text-center">
-            <p> <a href="/transfer"> Transfer Money To Another Account </a><p>
+            <p> <a href="http://localhost:3000/transfer"> Transfer Money To Another Account </a><p>
 
-            <p> <a href="/next-account"> Go to next account </a> </p>
+            <p> <a href="http://localhost:3000/nextAccount"> Go to next account </a> </p>
 
-            <p> <a href="/new-account"> Create New Account </a> </p>
+            <p> <a href="http://localhost:3000/addAccount"> Add Another Account </a> </p>
 
         </div>
 
 
+
+
+
         <script>
 
-          let jsonData = '';
-          //get data from json file
-          /*fetch("accountData.json")
-            .then(response=> response.json()){
+          //hard coding data
+          //let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
+
+          let objValues = '';
+
+            fetch("http://localhost:3000/jsonData")
+              .then(function(response) {
+
+                //below returns if passed object is json
+                return response.json();
+              })
+              .then(function(values) {
+                console.log(values);
+                console.log(values.val1);
+
+                let objValues = values;
+
+                document.getElementById('name').innerHTML
+                    = "Name: " + objValues.val1;
+
+                document.getElementById('acct').innerHTML
+                    = "Account Number: " + objValues.val2;
+
+                document.getElementById('bal').innerHTML
+                    = "Total Balance: " + objValues.val3;
+
+                document.getElementById('dep').innerHTML
+                    = "Deposit Money Form";
+
+                document.getElementById('with').innerHTML
+                    = "Withdraw Money Form";
+
+          let option =  document.getElementById('customerAccount')
+          let arr = ["Account A", "Account B", "Account C", "Account D"];
+
+            for (let i=0; i < arr.length; i++){
+              let pickValue = arr[i];
+              let elem = document.createElement("option");
+              elem.text = pickValue;
+              elem.value = pickValue;
+
+              option.appendChild(elem);
+
+            }
+
+        let accountView = document.getElementsByClassName('currentAccount').value;
+        console.log(accountView);
 
 
+
+        });
+
+          /*
+          fetch('accountData.json').then(function(response){
+              return response.json();
+          }).then(function(obj){
+                console.log(obj);
+          }).catch(function(error){
+                console.error('Error!!!');
+                console.error(error);
+          });
           */
-
-
-          let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
-
-
-          document.getElementById('name').innerHTML = "Name: " + val.name;
-          document.getElementById('acct').innerHTML = "Account Number: " + val.aNum;
-          document.getElementById('bal').innerHTML = "Total Balance: " + val.tBal;
-          document.getElementById('dep').innerHTML = "Deposit Money";
-          document.getElementById('with').innerHTML = "Withdraw Money";
+        /*
+          fetch("testFile.json")
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            });
+        */
 
         </script>
 

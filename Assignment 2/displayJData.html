@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <p id="output"></p>
+        <p id="data1"></p>
+
+        <script>
+
+        let objValues = '';
+
+          fetch("http://localhost:3000/jsonData")
+            .then(function(response) {
+              return response.json();
+            })
+            .then(function(values) {
+              console.log(values);
+              console.log(values.val1);
+
+              let objValues = values;
+
+              document.getElementById("output").innerHTML = objValues.val1;
+
+            });
+
+            //document.getElementById("output").innerHTML = output;
+
+        </script>
+
+
+    </body>
+
+</html>
