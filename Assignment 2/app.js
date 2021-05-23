@@ -16,7 +16,14 @@ const path = require('path')
 const app     = express();
 
 // Needed for security
+<<<<<<< Updated upstream
 const xssFilters = require('xss-filers');
+=======
+const xssFilters = require('xss-filters');
+
+//import from express
+app.use(express.json());
+>>>>>>> Stashed changes
 
 // Needed to parse the request body
 //Note that in version 4 of express, express.bodyParser() was
@@ -118,7 +125,7 @@ app.post('/login', function(req, res) {
 			randomNumber=randomNumber.substring(2,randomNumber.length);
 
 			req.mysession.loggedin = randomNumber;
-			res.redirect('/dashboard');
+			res.redirect('/results');
 		}
 		else
 		{
@@ -141,12 +148,17 @@ app.post("/logout", function(req, res){
 // The end-point for creating an account
 app.post("/create", function(req, res){
 
-
-
 });
 
 app.get("/results", function(req, res){
 
+<<<<<<< Updated upstream
+=======
+//Creating an endpoint to send JSON object with data
+app.get("/jsonData", function(req,res){
+
+  //hardcoded test values
+>>>>>>> Stashed changes
   let name = "test json first and last name";
   let accNum = "test json 12345";
   let totBal = "test json $10.00";
@@ -270,5 +282,117 @@ function getAccounts(username)
 	});
 }
 
+
+/////////////////////////
+// The end-point for testing
+app.get("/test", function(req, res){
+	getAccounts('person1')
+	.then(function(rows) {
+		console.log(rows);
+		//console.log(deposit('testaccountname', 100));		//uncomment to try deposit on terminal
+		//console.log(withdraw('testaccountname', 300));	//uncomment to try withdraw on terminal
+	})
+	.catch((err) => setImmediate(() => { throw err; }));
+});
+
+// HELPER FUNCTIONS //////////////////////////////////
+// Deposits money in the account named
+// @param accountName - the name of the account to deposit in
+// @param amount - amount to deposit
+function deposit(accountName, amount)
+{		
+	// Construct the query to get amount
+	let query = "USE bankDB; SELECT amount FROM userAccounts WHERE accountName = '" + accountName + "'"; 
+	let currentBalance = 0;
+	
+	// Query the DB for the user
+	try{
+		mysqlConn.query(query, function(err, qResult){
+			if(err) throw err;			
+				
+			// Go through the results of the second query
+			qResult[1].forEach(function(account){
+				currentBalance = account['amount']
+				
+				// Base case
+				if(amount <= 0)
+					throw err;
+				else
+				{
+					// Calculate new balance
+					currentBalance += amount;
+					
+					// Update DB
+					// Construct the query to get amount
+					let query = "USE bankDB; UPDATE userAccounts SET amount = " + currentBalance + " WHERE accountName = '" + accountName + "'"; 
+			
+					// Update amount
+					mysqlConn.query(query, function(err, result){
+						if(err) throw err;		
+						console.log('Deposit complete!');	
+						console.log(currentBalance)
+					});
+				}
+			});
+		});
+	}
+	catch(err){res.send("<b>Failed query</b>");}
+}
+
+function withdraw(accountName, amount)
+{		
+	// Construct the query to get amount
+	let query = "USE bankDB; SELECT amount FROM userAccounts WHERE accountName = '" + accountName + "'"; 
+	let currentBalance = 0;
+	
+	// Query the DB for the user
+	try{
+		mysqlConn.query(query, function(err, qResult){
+			if(err) throw err;			
+				
+			// Go through the results of the second query
+			qResult[1].forEach(function(account){
+				currentBalance = account['amount']
+				
+				// Base case
+				if(amount <= 0 || amount > currentBalance)
+					throw err;
+				else
+				{
+					// Calculate new balance
+					currentBalance -= amount;
+					
+					// Update DB
+					// Construct the query to get amount
+					let query = "USE bankDB; UPDATE userAccounts SET amount = " + currentBalance + " WHERE accountName = '" + accountName + "'"; 
+			
+					// Update amount
+					mysqlConn.query(query, function(err, result){
+						if(err) throw err;		
+						console.log('Withdraw complete!');	
+						console.log(currentBalance);
+					});
+				}
+			});
+		});
+	}
+	catch(err){res.send("<b>Failed query</b>");}
+}
+
+function getAccounts(username)
+{
+	return new Promise((resolve, reject)=>{
+		let query = 'USE bankDB; SELECT users.userName, accountName, amount FROM userAccounts JOIN users ON users.userID = userAccounts.userID;'
+		mysqlConn.query(query, function(err, results){
+			if(err) return reject(err);			
+			else
+			{
+				let s = JSON.stringify(results[1]);
+				let json = JSON.parse(s);
+				resolve(json);
+			}
+		});
+	});
+}
 
 app.listen(3000);
