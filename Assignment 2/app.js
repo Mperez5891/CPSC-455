@@ -15,6 +15,9 @@ const bodyParser = require("body-parser");
 const path = require('path')
 const app     = express();
 
+//import from express
+app.use(express.json());
+
 // Needed to parse the request body
 //Note that in version 4 of express, express.bodyParser() was
 //deprecated in favor of a separate 'body-parser' module.
@@ -61,7 +64,7 @@ app.get("/", function(req, res){
 	// Is this user logged in?
 	{
 		console.log("You're in");
-		res.redirect('/results');
+		res.redirect('/dashboard');
 	}
 	else
 	{
@@ -115,7 +118,7 @@ app.post('/login', function(req, res) {
 			randomNumber=randomNumber.substring(2,randomNumber.length);
 
 			req.mysession.loggedin = randomNumber;
-			res.redirect('/results');
+			res.redirect('/dashboard');
 		}
 		else
 		{
@@ -123,11 +126,6 @@ app.post('/login', function(req, res) {
 			res.send("<b>Failed authentication</b>");
 		}
 	});
-});
-
-// displays all of the user's information
-app.get("/results", function(req, res) {
-	res.sendFile(path.join(__dirname+ '/results.html'));
 });
 
 // The end-point for logging out
@@ -151,18 +149,32 @@ app.post("/create", function(req, res){
 //Creating an endpoint to send JSON object with data
 app.get("/jsonData", function(req,res){
 
+
+
+  //hardcoded test values
   let name = "test json first and last name";
   let accNum = "test json 12345";
   let totBal = "test json $10.00";
+  let customerAccounts = ['a1', 'a2', 'a3'];
 
   //write json object into .json file
-  let o = {"val1":name, "val2":accNum,"val3":totBal};
+  let o = {
+            "val1":name,
+            "val2":accNum,
+            "val3":totBal,
+            "val4":customerAccounts
+          };
 
   //create internal json file to allow programmer to view
   let jsonO = JSON.stringify(o, null, 2);
   fs.writeFileSync('accountData.json',jsonO);
 
-  //respond with json file
+  //console.log(jsonO);
+  //res.setHeader('Content-Type', 'application/json')
+
+  //res.send(jsonO);
+
+  //respond with json file. Below is function way of doing it
   res.json(o);
 
 });
@@ -212,6 +224,11 @@ app.get("/addAccount", function(req, res){
 
   res.send("Work In Progress")
 
+});
+
+app.post("/selectAccount", function(req, res){
+  let choice = req.body;
+  res.send(choice);
 });
 
 app.listen(3000);
