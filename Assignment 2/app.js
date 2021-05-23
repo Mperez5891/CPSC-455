@@ -16,14 +16,10 @@ const path = require('path')
 const app     = express();
 
 // Needed for security
-<<<<<<< Updated upstream
-const xssFilters = require('xss-filers');
-=======
 const xssFilters = require('xss-filters');
 
 //import from express
 app.use(express.json());
->>>>>>> Stashed changes
 
 // Needed to parse the request body
 //Note that in version 4 of express, express.bodyParser() was
@@ -71,13 +67,17 @@ app.get("/", function(req, res){
 	// Is this user logged in?
 	{
 		console.log("You're in");
-		res.redirect('/dashboard');
+		res.redirect('/results');
 	}
 	else
 	{
 		// Login required
 		res.sendFile(path.join(__dirname+ '/index.html'));
 	}
+});
+
+app.get("/results", function(req, res){
+	res.sendFile(path.join(__dirname+ '/results.html'));
 });
 
 // The handler for the request of the login page
@@ -150,15 +150,10 @@ app.post("/create", function(req, res){
 
 });
 
-app.get("/results", function(req, res){
-
-<<<<<<< Updated upstream
-=======
 //Creating an endpoint to send JSON object with data
 app.get("/jsonData", function(req,res){
 
   //hardcoded test values
->>>>>>> Stashed changes
   let name = "test json first and last name";
   let accNum = "test json 12345";
   let totBal = "test json $10.00";
