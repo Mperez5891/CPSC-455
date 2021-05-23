@@ -61,7 +61,7 @@ app.get("/", function(req, res){
 	// Is this user logged in?
 	{
 		console.log("You're in");
-		res.redirect('/dashboard');
+		res.redirect('/results');
 	}
 	else
 	{
@@ -115,7 +115,7 @@ app.post('/login', function(req, res) {
 			randomNumber=randomNumber.substring(2,randomNumber.length);
 
 			req.mysession.loggedin = randomNumber;
-			res.redirect('/dashboard');
+			res.redirect('/results');
 		}
 		else
 		{
@@ -123,6 +123,11 @@ app.post('/login', function(req, res) {
 			res.send("<b>Failed authentication</b>");
 		}
 	});
+});
+
+// displays all of the user's information
+app.get("/results", function(req, res) {
+	res.sendFile(path.join(__dirname+ '/results.html'));
 });
 
 // The end-point for logging out
