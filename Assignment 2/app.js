@@ -150,29 +150,77 @@ app.post("/create", function(req, res){
 
 });
 
-
 //Creating an endpoint to send JSON object with data
 app.get("/jsonData", function(req,res){
-
-
-
-  //hardcoded test values
-  let name = "test json first and last name";
-  let accNum = "test json 12345";
-  let totBal = "test json $10.00";
-  let customerAccounts = ['a1', 'a2', 'a3'];
-
-  //write json object into .json file
-  let o = {
-            "val1":name,
-            "val2":accNum,
-            "val3":totBal,
-            "val4":customerAccounts
-          };
-
+	//let userName = req.body.username;
+	let userName = 'testusername';
+	
+	//hardcoded test values
+	let name = '';
+	let accNum = '';
+	let totBal = [];
+	let customerAccounts = [];
+	let temp;
+	
+	//write json object into .json file
+	let o = {};
+	
+	// Get name
+	getName(userName)
+	.then(function(rows) {
+		o.name = rows[0].name;
+		
+		getUserID(userName)
+		.then(function(rows) {
+			o.accNum = rows[0].userID;
+			
+			getAccounts(userName)
+			.then(function(rows) {
+				temp = rows;
+		
+				for(let i = 0; i < temp.length; i++)
+				{	
+					customerAccounts.push(temp[i].accountName);
+					totBal.push(temp[i].amount);
+				}
+				o.totBal = totBal;
+				o.customerAccounts = customerAccounts;
+				
+				 //create internal json file to allow programmer to view
+				let jsonO = JSON.stringify(o, null, 2);
+				fs.writeFileSync('accountData.json',jsonO);
+				
+				res.json(o);
+			})
+		})
+	})
+	.catch((err) => setImmediate(() => { throw err; }));
+	
+	// Get user ID
+//	getUserID(userName)
+//	.then(function(rows) {
+//		o.accNum = rows[0].userID;
+//	})
+//	.catch((err) => setImmediate(() => { throw err; }));
+	
+	// Get accounts and amounts
+//	getAccounts(userName)
+//	.then(function(rows) {
+//		temp = rows;
+		
+//		for(let i = 0; i < temp.length; i++)
+//		{	
+//			customerAccounts.push(temp[i].accountName);
+//			totBal.push(temp[i].amount);
+//		}
+//		o.totBal = totBal;
+//		o.customerAccounts = customerAccounts;
+//	})
+//	.catch((err) => setImmediate(() => { throw err; }));
+	
   //create internal json file to allow programmer to view
-  let jsonO = JSON.stringify(o, null, 2);
-  fs.writeFileSync('accountData.json',jsonO);
+//  let jsonO = JSON.stringify(o, null, 2);
+// fs.writeFileSync('accountData.json',jsonO);
 
   //console.log(jsonO);
   //res.setHeader('Content-Type', 'application/json')
@@ -180,9 +228,10 @@ app.get("/jsonData", function(req,res){
   //res.send(jsonO);
 
   //respond with json file. Below is function way of doing it
-  res.json(o);
+//  res.json(o);
 
 });
+
 
 //can look at JSON Data
 app.get("/displayJSONData", function(req, res){
