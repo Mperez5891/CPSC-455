@@ -114,11 +114,7 @@
 
 			let objValues = '';
 			
-			// Doesn't work
-			let name = <%= name %>;
-			console.log(name);
-			
-            fetch("http://localhost:3000/jsonData/" + name)
+            fetch("http://localhost:3000/jsonData/")
               .then(function(response) {
 
                 //below returns if passed object is json
