@@ -223,8 +223,13 @@ app.get("/displayJSONData", function(req, res){
 });
 
 app.get("/results", function(req, res){
-	res.sendFile(__dirname + "/results.html");
 
+  res.sendFile(__dirname + "/results.html");
+});
+
+app.post("/logout", function(req, res) {
+	logout();
+	res.sendFile(__dirname + "/index.html");
 });
 
 app.post("/deposit", function(req, res){
@@ -240,15 +245,18 @@ app.post("/withdraw", function(req, res){
   res.sendFile(__dirname + "/results.html");
 });
 
-app.get("/transfer", function(req, res){
+//app.get("/transfer", function(req, res){
 
-  res.sendFile(__dirname + "/transfer.html");
+//  res.sendFile(__dirname + "/transfer.html");
 
-});
+//});
 
-app.get("/transfer", function(req, res){
-
-  res.sendFile(__dirname + "/transfer.html");
+app.post("/transfer", function(req, res){
+  
+  let userInput = req.body.tamt;
+  transferAmount(authObj.currentState,authObj.currentState, userInput);
+  res.sendFile(__dirname + "/results.html")
+  //res.sendFile(__dirname + "/transfer.html");
 
 });
 
