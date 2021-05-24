@@ -104,7 +104,7 @@ app.post('/login', function(req, res) {
 			randomNumber=randomNumber.substring(2,randomNumber.length);
 
 			req.mysession.loggedin = randomNumber;
-			res.redirect('/results');
+			res.redirect('/results/' + userName);
 		}
 		else
 		{
@@ -130,9 +130,9 @@ app.post("/create", function(req, res){
 });
 
 //Creating an endpoint to send JSON object with data
-app.get("/jsonData", function(req,res){
-	//let userName = req.body.username;
-	let userName = 'testusername';
+app.get("/jsonData/:username", function(req,res){
+	let userName = req.params.username;
+	//let userName = 'testusername';
 	
 	//hardcoded test values
 	let name = '';
@@ -218,10 +218,9 @@ app.get("/displayJSONData", function(req, res){
   res.sendFile(__dirname + "/displayJData.html");
 });
 
-app.get("/results", function(req, res){
-
-
-  res.sendFile(__dirname + "/results.html");
+app.get("/results/:username", function(req, res){
+	let userName = req.params.username;
+	res.sendFile(__dirname + "/results.html", {name:userName});
 
 });
 
