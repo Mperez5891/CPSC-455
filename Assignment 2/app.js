@@ -56,8 +56,7 @@ app.get("/", function(req, res){
 	}
 	else
 	{
-		req.mysession.reset();
-		authObj = new Object();
+		logout();
 		// Login required
 		res.sendFile(path.join(__dirname+ '/index.html'));
 	}
@@ -121,14 +120,15 @@ app.post('/login', function(req, res) {
 });
 
 // The end-point for logging out
-app.post("/logout", function(req, res){
 
+function logout()
+{
 	// Kill the session
 	req.mysession.reset();
+	authObj = new Object();
 	console.log("Session Cleared!");
-	res.redirect('/');
+}
 
-});
 
 // The end-point for creating an account
 app.post("/create", function(req, res){
@@ -431,6 +431,5 @@ function transferAmount(userName, accountName1, accountName2, amount)
 	})
 	.catch((error) => setImmediate(() => { throw error; }));
 }
-
 
 app.listen(3000);
