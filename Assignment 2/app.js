@@ -73,13 +73,6 @@ app.get("/", function(req, res){
 	}
 });
 
-// The handler for the user's information page
-// @param req - the request
-// @param res - the response
-app.get("/", function(req, res){
-	res.sendFile(path.join(__dirname+ '/results.html'));
-});
-
 // The handler for the request of the login page
 // @param req - the request
 // @param res - the response
@@ -153,23 +146,57 @@ app.post("/create", function(req, res){
 
 //Creating an endpoint to send JSON object with data
 app.get("/jsonData", function(req,res){
+	//let userName = req.body.username;
+	let userName = 'testusername';
+	
+	//hardcoded test values
+	let name = '';
+	let accNum = '';
+	let totBal = [];
+	let customerAccounts = [];
+	let temp;
+	
+		//write json object into .json file
+	let o = {
+		"val1":name,
+		"val2":accNum,
+		"val3":totBal,
+		"val4":customerAccounts
+	};
+	
+	// Get name
+	getName(userName)
+	.then(function(rows) {
+		o.name = rows[0].name;
+	})
+	.catch((err) => setImmediate(() => { throw err; }));
+	
+	// Get user ID
+	getUserID(userName)
+	.then(function(rows) {
+		o.accNum = rows[0].userID;
+	})
+	.catch((err) => setImmediate(() => { throw err; }));
+	
+	// Get accounts and amounts
+	getAccounts(userName)
+	.then(function(rows) {
+		temp = rows;
+		
+		for(let i = 0; i < temp.length; i++)
+		{	
+			customerAccounts.push(temp[i].accountName);
+			totBal.push(temp[i].amount);
+		}
+		o.totBal = totBal;
+		o.customerAccounts = customerAccounts;
+	})
+	.catch((err) => setImmediate(() => { throw err; }));
 
+	sleep(5000);
 
-
-  //hardcoded test values
-  let name = "test json first and last name";
-  let accNum = "test json 12345";
-  let totBal = "test json $10.00";
-  let customerAccounts = ['a1', 'a2', 'a3'];
-
-  //write json object into .json file
-  let o = {
-            "val1":name,
-            "val2":accNum,
-            "val3":totBal,
-            "val4":customerAccounts
-          };
-
+	console.log(o);
+	
   //create internal json file to allow programmer to view
   let jsonO = JSON.stringify(o, null, 2);
   fs.writeFileSync('accountData.json',jsonO);
@@ -331,8 +358,45 @@ function withdraw(userName, accountName, amount)
 function getAccounts(username)
 {
 	return new Promise((resolve, reject)=>{
-		let query = 'USE bankDB; SELECT users.userName, accountName, '
-		+ 'amount FROM userAccounts JOIN users ON users.userID = userAccounts.userID;'
+		let query = 'USE bankDB; SELECT accountName, '
+		+ 'amount FROM userAccounts JOIN users ON users.userID = userAccounts.userID '
+		+ "WHERE userName = '" + username + "'"; 
+		mysqlConn.query(query, function(err, results){
+			if(err) return reject(err);			
+			else
+			{
+				let s = JSON.stringify(results[1]);
+				let json = JSON.parse(s);
+				resolve(json);
+			}
+		});
+	});
+}
+
+function getName(username)
+{
+	return new Promise((resolve, reject)=>{
+		let query = "USE bankDB; SELECT name "
+		+ "FROM users WHERE userName = '" + username + "'";
+		
+		mysqlConn.query(query, function(err, results){
+			if(err) return reject(err);			
+			else
+			{
+				let s = JSON.stringify(results[1]);
+				let json = JSON.parse(s);
+				resolve(json);
+			}
+		});
+	});
+}
+
+function getUserID(username)
+{
+	return new Promise((resolve, reject)=>{
+		let query = "USE bankDB; SELECT userID "
+		+ "FROM users WHERE userName = '" + username + "'";
+		
 		mysqlConn.query(query, function(err, results){
 			if(err) return reject(err);			
 			else
@@ -365,4 +429,11 @@ function transferAmount(userName, accountName1, accountName2, amount)
 	.catch((error) => setImmediate(() => { throw error; }));
 }
 
+function sleep(milliseconds) {
+	const date = Date.now();
+	let currentDate = null;
+	do {
+		currentDate = Date.now();
+	}while (currentDate - date < milliseconds);
+}
 app.listen(3000);
