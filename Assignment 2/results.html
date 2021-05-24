@@ -112,9 +112,13 @@
           //hard coding data
           //let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
 
-          let objValues = '';
-
-            fetch("http://localhost:3000/jsonData")
+			let objValues = '';
+			
+			// Doesn't work
+			let name = <%= name %>;
+			console.log(name);
+			
+            fetch("http://localhost:3000/jsonData/" + name)
               .then(function(response) {
 
                 //below returns if passed object is json
@@ -123,22 +127,22 @@
               })
               .then(function(values) {
                 console.log(values);
-                console.log(values.val1);
+                console.log(values.name);
 
                 let objValues = values;
 
 
                 document.getElementById('name').innerHTML
-                    = "Name: " + objValues.val1;
+                    = "Name: " + objValues.name;
 
                 document.getElementById('acct').innerHTML
-                    = "Account Name: " + objValues.val2;
+                    = "Account Name: " + objValues.accNum;
 
                 document.getElementById('bal').innerHTML
-                    = "Total Balance: " + objValues.val3;
+                    = "Total Balance: " + objValues.totBal;
 
                 //hardcoded array to fill pick list
-                let arr = ["Account A", "Account B", "Account C", "Account D"];
+                let arr = objValues.customerAccounts;
 
 
                 //aVal is array of values to fill and param2 is where to placeList
