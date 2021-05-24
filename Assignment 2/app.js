@@ -41,6 +41,8 @@ const  mysqlConn = mysql.createConnection({
 
 });
 
+let authObj = new Object();
+
 // The handler for the home page
 // @param req - the request
 // @param res - the response
@@ -50,10 +52,12 @@ app.get("/", function(req, res){
 	// Is this user logged in?
 	{
 		console.log("You're in");
-		res.redirect('/dashboard');
+		res.redirect('/results');
 	}
 	else
 	{
+		req.mysession.reset();
+		authObj = new Object();
 		// Login required
 		res.sendFile(path.join(__dirname+ '/index.html'));
 	}
@@ -104,7 +108,9 @@ app.post('/login', function(req, res) {
 			randomNumber=randomNumber.substring(2,randomNumber.length);
 
 			req.mysession.loggedin = randomNumber;
-			res.redirect('/results/' + userName);
+			authObj.username = userName;
+			authObj.authenticated = true;
+			res.redirect('/results');
 		}
 		else
 		{
@@ -130,11 +136,9 @@ app.post("/create", function(req, res){
 });
 
 //Creating an endpoint to send JSON object with data
-app.get("/jsonData/:username", function(req,res){
-	let userName = req.params.username;
-	//let userName = 'testusername';
+app.get("/jsonData", function(req,res){
+	let userName = authObj.username;
 	
-	//hardcoded test values
 	let name = '';
 	let accNum = '';
 	let totBal = [];
@@ -218,9 +222,8 @@ app.get("/displayJSONData", function(req, res){
   res.sendFile(__dirname + "/displayJData.html");
 });
 
-app.get("/results/:username", function(req, res){
-	let userName = req.params.username;
-	res.sendFile(__dirname + "/results.html", {name:userName});
+app.get("/results", function(req, res){
+	res.sendFile(__dirname + "/results.html");
 
 });
 
@@ -428,5 +431,6 @@ function transferAmount(userName, accountName1, accountName2, amount)
 	})
 	.catch((error) => setImmediate(() => { throw error; }));
 }
+
 
 app.listen(3000);
