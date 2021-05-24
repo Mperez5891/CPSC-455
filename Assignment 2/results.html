@@ -18,13 +18,13 @@
 
         <h2> Select Account </h2>
 
-        <form id="list" action="http://localhost:3000/selectAccount" method="post">
+
           <label for="customerAccount">Pick An Account</label>
             <select id="customerAccount" name="customerAccount" required/>
                 <!--Insert Options List -->
             </select>
-          <input type="submit" value="Submit">
-        </form>
+          <button type="button" onclick="getCurrentAccount()"> Confirm </button>
+
 
         <h2> Account Details </h2>
 
@@ -68,6 +68,7 @@
                     <!--Insert Options List -->
                 </select>
 
+
               <br> <br>
 
               <label for="transferTo"> Transfer To Account </label>
@@ -81,7 +82,7 @@
                 <input type="number" id="tAmt" name="tAmt"
                   min="0.01" max="500" step=".01" required/> <br>
 
-              <input type="submit" value="Submit">
+              <input type="submit" value="Submit" onclick="getTransferInputs()"/>
 
             </form>
             <br> <br>
@@ -109,46 +110,32 @@
 
         <script>
 
-          //hard coding data
-          //let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
+          let currentCustomerAccount = "";
+          let currIndex = 4;
+          let transferToAccount = "";
+          let transferFromAccount = "";
+          let transferAmount = "";
 
-          //test values with an array of objects
-          let testArray = [];
-
-          let accountInfo = {
-            name:"Cedric",
-            accountName:"first account",
-            totAmount:100
+          function getCurrentAccount(){
+            let currentCustomerAccount = document.getElementById("customerAccount").value;
+            alert('Selection: ' + currentCustomerAccount);
+            currIndex++;
+            window.location.reload();
           };
 
-          testArray.push(accountInfo);
+          //validation - if/else statement to see if overdrawn
+          function getTransferInputs(){
 
-          accountInfo = {
-            name:"Cedric",
-            accountName:"second account",
-            totAmount:345
-          };
+            let transferFromAccount = document.getElementById("transferFrom").value;
+            let transferToAccount = document.getElementById("transferTo").value;
+            let transferAmount = document.getElementById("tAmt").value;
 
-          testArray.push(accountInfo);
+            alert('Transfer from ' + transferFromAccount + ' to ' + transferToAccount
+                  + ' $' + transferAmount);
 
-          accountInfo = {
-            name:"Cedric",
-            accountName:"third account",
-            totAmount:589
-          };
-
-          testArray.push(accountInfo);
-
-          let chosenAcct = 2;
-          let currIndex = chosenAcct;
+          }
 
 
-          //show test array 
-          console.log(testArray[currIndex].name)
-
-          let arr = testArray;
-
-			let objValues = '';
 
             fetch("http://localhost:3000/jsonData/")
               .then(function(response) {
@@ -159,28 +146,40 @@
               })
               .then(function(values) {
                 console.log(values);
-                console.log(values.name);
+
+                console.log(currentCustomerAccount);
+
+
+                /*
+                if(values.indexOf(currentCustomerAccount) > -1){
+
+                    currIndex = 0;
+                }
+                else
+                {
+                currIndex = values.indexOf(currentCustomerAccount);
+                }
+                */
+
+                console.log(currIndex);
+
+                console.log(values[currIndex].name);
 
                 //taken out for testing
                 //let objValues = values;
 
-                let objValues = testArray;
-
 
                 document.getElementById('name').innerHTML
-                    = "Name: " + objValues[currIndex].name;
+                    = "Name: " + values[currIndex].name;
 
                 document.getElementById('acct').innerHTML
-                    = "Account Name: " + objValues[currIndex].accountName;
+                    = "Account Name: " + values[currIndex].accountName;
 
                 document.getElementById('bal').innerHTML
-                    = "Total Balance: " + objValues[currIndex].totAmount;
-
-                //hardcoded array to fill pick list
-                //let arr = objValues.customerAccounts;
+                    = "Total Balance: $" + values[currIndex].amount;
 
 
-                //aVal is array of values to fill and param2 is where to placeList
+                //aVal is array of values to fill and location is where to placeList
                 function fillSelection(aVal, location){
 
                 let placeHolder =  document.getElementById(location)
@@ -202,6 +201,8 @@
 
                 };
 
+                let arr = values;
+
                 fillSelection(arr,'customerAccount');
                 fillSelection(arr,'transferTo');
                 fillSelection(arr, 'transferFrom');
@@ -216,26 +217,10 @@
 
           });
 
-          /*
-          fetch('accountData.json').then(function(response){
-              return response.json();
-          }).then(function(obj){
-                console.log(obj);
-          }).catch(function(error){
-                console.error('Error!!!');
-                console.error(error);
-          });
 
-          */
-        /*
-          fetch("testFile.json")
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            });
-        */
 
         </script>
+
 
 
     </body>

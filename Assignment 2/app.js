@@ -136,12 +136,12 @@ app.post("/create", function(req, res){
 });
 
 //Creating an endpoint to send JSON object with data
+//Creating an endpoint to send JSON object with data
 app.get("/jsonData", function(req,res){
 	let userName = authObj.username;
 
 	let name = '';
-	let accNum = '';
-	let totBal = [];
+	let accID = '';
 	let customerAccounts = [];
 	let temp;
 
@@ -151,11 +151,11 @@ app.get("/jsonData", function(req,res){
 	// Get name
 	getName(userName)
 	.then(function(rows) {
-		o.name = rows[0].name;
+		name = rows[0].name;
 
 		getUserID(userName)
 		.then(function(rows) {
-			o.accNum = rows[0].userID;
+			accID = rows[0].userID;
 
 			getAccounts(userName)
 			.then(function(rows) {
@@ -163,19 +163,20 @@ app.get("/jsonData", function(req,res){
 
 				for(let i = 0; i < temp.length; i++)
 				{
-					customerAccounts.push(temp[i].accountName);
-					totBal.push(temp[i].amount);
+					customerAccounts.push({'name':name, 'accID':accID, 'accountName':temp[i].accountName,'amount':temp[i].amount});
 				}
-				o.totBal = totBal;
-				o.customerAccounts = customerAccounts;
 
+				o = customerAccounts;
+				console.log(o);
 				 //create internal json file to allow programmer to view
 				let jsonO = JSON.stringify(o, null, 2);
 				fs.writeFileSync('accountData.json',jsonO);
 
 				res.json(o);
 			})
+			.catch((err) => setImmediate(() => { throw err; }));
 		})
+		.catch((err) => setImmediate(() => { throw err; }));
 	})
 	.catch((err) => setImmediate(() => { throw err; }));
 
@@ -243,15 +244,10 @@ app.post("/withdraw", function(req, res){
   res.sendFile(__dirname + "/withdraw.html");
 });
 
-app.get("/transfer", function(req, res){
 
-  res.sendFile(__dirname + "/transfer.html");
+app.post("/transfer", function(req, res){
 
-});
-
-app.get("/transfer", function(req, res){
-
-  res.sendFile(__dirname + "/transfer.html");
+  //res.sendFile(__dirname + "/result.html");
 
 });
 
