@@ -41,20 +41,6 @@ const  mysqlConn = mysql.createConnection({
 
 });
 
-// Parses a database of usernames and passwords
-// @param dbFile - the database file
-// @return - the list of user name and passwords
-function parseDB(dbFile)
-{
-	// Read the file
-	fs.readFile(dbFile, "utf8", function(error, data){
-
-		console.log(data);
-		data.split(";");
-
-	});
-}
-
 // The handler for the home page
 // @param req - the request
 // @param res - the response
@@ -71,13 +57,6 @@ app.get("/", function(req, res){
 		// Login required
 		res.sendFile(path.join(__dirname+ '/index.html'));
 	}
-});
-
-// The handler for the user's information page
-// @param req - the request
-// @param res - the response
-app.get("/", function(req, res){
-	res.sendFile(path.join(__dirname+ '/results.html'));
 });
 
 // The handler for the request of the login page
