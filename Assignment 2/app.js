@@ -57,6 +57,7 @@ app.get("/", function(req, res){
 	else
 	{
 		logout();
+		req.mysession.reset();
 		// Login required
 		res.sendFile(path.join(__dirname+ '/index.html'));
 	}
@@ -124,7 +125,6 @@ app.post('/login', function(req, res) {
 function logout()
 {
 	// Kill the session
-	req.mysession.reset();
 	authObj = new Object();
 	console.log("Session Cleared!");
 }
