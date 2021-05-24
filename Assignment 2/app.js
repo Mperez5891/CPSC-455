@@ -266,12 +266,36 @@ app.post("/selectAccount", function(req, res){
   res.send(choice);
 });
 
+app.get("/test", function(req, res){
+	let userName = authObj.username;
+	
+	// Get accounts and amounts
+	getAccounts(userName)
+	.then(function(rows) {
+		let temp = rows;
+		let tempList = []; 
+		
+		for(let i = 0; i < temp.length; i++)
+		{	
+			tempList.push({
+				'accountName': temp[i].accountName,
+				'amount': temp[i].amount
+			});
+
+		}
+		
+		console.log(tempList);
+	})
+	.catch((err) => setImmediate(() => { throw err; }));
+
+});
 // HELPER FUNCTIONS //////////////////////////////////////////////////
 // Deposits money in the account named
 // @param accountName - the name of the account to deposit in
 // @param amount - amount to deposit
-function deposit(userName, accountName, amount)
+function deposit(accountName, amount)
 {		
+	let userName = authObj.username;
 	// Construct the query to get amount
 	let query = "SELECT amount FROM userAccounts "
 	+ "JOIN users ON users.userID = userAccounts.userID "
@@ -314,8 +338,9 @@ function deposit(userName, accountName, amount)
 	catch(err){console.log('Failed deposit');}
 }
 
-function withdraw(userName, accountName, amount)
+function withdraw(accountName, amount)
 {		
+	let userName = authObj.username;
 	// Construct the query to get amount
 	let query = "SELECT amount FROM userAccounts "
 	+ "JOIN users ON users.userID = userAccounts.userID "
@@ -412,8 +437,9 @@ function getUserID(username)
 	});
 }
 
-function transferAmount(userName, accountName1, accountName2, amount)
+function transferAmount(accountName1, accountName2, amount)
 {
+	let userName = authObj.username;
 	return new Promise((resolve, reject)=>{
 		try{
 			withdraw(userName, accountName1, amount);
@@ -431,5 +457,6 @@ function transferAmount(userName, accountName1, accountName2, amount)
 	})
 	.catch((error) => setImmediate(() => { throw error; }));
 }
+
 
 app.listen(3000);
