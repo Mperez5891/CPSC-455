@@ -141,7 +141,6 @@ app.get("/jsonData", function(req,res){
 	
 	let name = '';
 	let accNum = '';
-	let totBal = [];
 	let customerAccounts = [];
 	let temp;
 	
@@ -151,31 +150,32 @@ app.get("/jsonData", function(req,res){
 	// Get name
 	getName(userName)
 	.then(function(rows) {
-		o.name = rows[0].name;
+		name = rows[0].name;
 		
 		getUserID(userName)
 		.then(function(rows) {
-			o.accNum = rows[0].userID;
+			accNum = rows[0].userID;
 			
 			getAccounts(userName)
 			.then(function(rows) {
 				temp = rows;
 		
 				for(let i = 0; i < temp.length; i++)
-				{	
-					customerAccounts.push(temp[i].accountName);
-					totBal.push(temp[i].amount);
+				{
+					customerAccounts.push({'name':name, 'accNum':accNum, 'accountName':temp[i].accountName,'amount':temp[i].amount});
 				}
-				o.totBal = totBal;
-				o.customerAccounts = customerAccounts;
 				
+				o = customerAccounts;
+				console.log(o);
 				 //create internal json file to allow programmer to view
 				let jsonO = JSON.stringify(o, null, 2);
 				fs.writeFileSync('accountData.json',jsonO);
 				
 				res.json(o);
 			})
+			.catch((err) => setImmediate(() => { throw err; }));
 		})
+		.catch((err) => setImmediate(() => { throw err; }));
 	})
 	.catch((err) => setImmediate(() => { throw err; }));
 	
