@@ -140,7 +140,7 @@ app.get("/jsonData", function(req,res){
 	let userName = authObj.username;
 	
 	let name = '';
-	let accNum = '';
+	let accID = '';
 	let customerAccounts = [];
 	let temp;
 	
@@ -154,7 +154,7 @@ app.get("/jsonData", function(req,res){
 		
 		getUserID(userName)
 		.then(function(rows) {
-			accNum = rows[0].userID;
+			accID = rows[0].userID;
 			
 			getAccounts(userName)
 			.then(function(rows) {
@@ -162,7 +162,7 @@ app.get("/jsonData", function(req,res){
 		
 				for(let i = 0; i < temp.length; i++)
 				{
-					customerAccounts.push({'name':name, 'accNum':accNum, 'accountName':temp[i].accountName,'amount':temp[i].amount});
+					customerAccounts.push({'name':name, 'accID':accID, 'accountName':temp[i].accountName,'amount':temp[i].amount});
 				}
 				
 				o = customerAccounts;
