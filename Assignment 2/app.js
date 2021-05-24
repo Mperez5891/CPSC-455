@@ -229,12 +229,15 @@ app.get("/results", function(req, res){
 
 app.post("/deposit", function(req, res){
 
-  res.sendFile(__dirname + "/deposit.html");
+  let userInput = req.body.amt;
+  deposit(authObj.currentState, userInput);
+  res.sendFile(__dirname + "/results.html");
 });
 
 app.post("/withdraw", function(req, res){
-
-  res.sendFile(__dirname + "/withdraw.html");
+  let userInput = req.body.amt;
+  withdraw(authObj.currentState, userInput);
+  res.sendFile(__dirname + "/results.html");
 });
 
 app.get("/transfer", function(req, res){
@@ -262,8 +265,11 @@ app.get("/addAccount", function(req, res){
 });
 
 app.post("/selectAccount", function(req, res){
-  let choice = req.body;
-  res.send(choice);
+let choice = req.body;
+authObj.currentState = choice.customerAccount;
+console.log(authObj.currentState);
+//res.send(choice);
+res.sendFile(__dirname + "/results.html");
 });
 
 app.get("/test", function(req, res){
@@ -315,7 +321,7 @@ function deposit(accountName, amount)
 				else
 				{
 					// Calculate new balance
-					currentBalance += amount;
+					currentBalance = (Math.trunc(currentBalance * 100) + Math.trunc(amount * 100)) / 100;
 					
 					// Update DB
 					// Construct the query to get amount
@@ -360,7 +366,7 @@ function withdraw(accountName, amount)
 				else
 				{
 					// Calculate new balance
-					currentBalance -= amount;
+					currentBalance = (Math.trunc(currentBalance * 100) - Math.trunc(amount * 100)) / 100;;
 					
 					// Update DB
 					// Construct the query to get amount
