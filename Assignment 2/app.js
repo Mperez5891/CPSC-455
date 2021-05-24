@@ -350,18 +350,16 @@ app.get("/nextAccount", function(req, res){
 
 });
 
-app.get("/addAccount", function(req, res){
-
-  res.send("Work In Progress")
-
-});
-
 app.post("/selectAccount", function(req, res){
   let choice = req.body;
   res.send(choice);
 });
 
 
+app.post("/addAccount", function(req, res){
+  let choice = req.body;
+  res.send(choice);
+});
 
 
 app.listen(3000);
