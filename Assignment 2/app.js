@@ -41,19 +41,236 @@ const  mysqlConn = mysql.createConnection({
 
 });
 
-// Parses a database of usernames and passwords
-// @param dbFile - the database file
-// @return - the list of user name and passwords
-function parseDB(dbFile)
-{
-	// Read the file
-	fs.readFile(dbFile, "utf8", function(error, data){
+let authObj = new Object();
 
-		console.log(data);
-		data.split(";");
+// The handler for the home page
+// @param req - the request
+// @param res - the response
+app.get("/", function(req, res){
 
+	if(req.mysession.loggedin)
+	// Is this user logged in?
+	{
+		console.log("You're in");
+		res.redirect('/results');
+	}
+	else
+	{
+		logout();
+    req.mysession.reset();
+		// Login required
+		res.sendFile(path.join(__dirname+ '/index.html'));
+	}
+});
+
+// The handler for the request of the login page
+// @param req - the request
+// @param res - the response
+app.post('/login', function(req, res) {
+
+	// Get the username and password data from the form
+	let userName = req.body.username;
+	let password = req.body.password;
+
+	// Construct the query
+	let query = "USE bankDB; SELECT username,password from users where userName='" + userName + "' AND password='" + password + "'";
+	console.log(query);
+
+	// Query the DB for the user
+	mysqlConn.query(query, function(err, qResult){
+
+		if(err) throw err;
+		console.log(qResult[1]);
+
+		// Does the password match?
+		let match = false;
+
+		// Go through the results of the second query
+		qResult[1].forEach(function(account){
+
+			if(account['username'] == userName && account['password'] == password)
+			{
+				console.log("Match!");
+
+				// We have a match!
+				match = true;
+
+				//break;
+			}
+		});
+
+		// Login succeeded! Set the session variable and send the user
+		// to the dashboard
+		if(match)
+		{
+			// update the cookie
+			let randomNumber=Math.random().toString();
+			randomNumber=randomNumber.substring(2,randomNumber.length);
+
+			req.mysession.loggedin = randomNumber;
+			authObj.username = userName;
+			authObj.authenticated = true;
+			res.redirect('/results');
+		}
+		else
+		{
+			// If no matches have been found, we are done
+			res.send("<b>Failed authentication</b>");
+		}
 	});
+});
+
+// The end-point for logging out
+
+function logout()
+{
+	// Kill the session
+	authObj = new Object();
+	console.log("Session Cleared!");
 }
+
+
+// The end-point for creating an account
+app.post("/create", function(req, res){
+
+});
+
+//Creating an endpoint to send JSON object with data
+app.get("/jsonData", function(req,res){
+	let userName = authObj.username;
+
+	let name = '';
+	let accNum = '';
+	let totBal = [];
+	let customerAccounts = [];
+	let temp;
+
+	//write json object into .json file
+	let o = {};
+
+	// Get name
+	getName(userName)
+	.then(function(rows) {
+		o.name = rows[0].name;
+
+		getUserID(userName)
+		.then(function(rows) {
+			o.accNum = rows[0].userID;
+
+			getAccounts(userName)
+			.then(function(rows) {
+				temp = rows;
+
+				for(let i = 0; i < temp.length; i++)
+				{
+					customerAccounts.push(temp[i].accountName);
+					totBal.push(temp[i].amount);
+				}
+				o.totBal = totBal;
+				o.customerAccounts = customerAccounts;
+
+				 //create internal json file to allow programmer to view
+				let jsonO = JSON.stringify(o, null, 2);
+				fs.writeFileSync('accountData.json',jsonO);
+
+				res.json(o);
+			})
+		})
+	})
+	.catch((err) => setImmediate(() => { throw err; }));
+
+	// Get user ID
+//	getUserID(userName)
+//	.then(function(rows) {
+//		o.accNum = rows[0].userID;
+//	})
+//	.catch((err) => setImmediate(() => { throw err; }));
+
+	// Get accounts and amounts
+//	getAccounts(userName)
+//	.then(function(rows) {
+//		temp = rows;
+
+//		for(let i = 0; i < temp.length; i++)
+//		{
+//			customerAccounts.push(temp[i].accountName);
+//			totBal.push(temp[i].amount);
+//		}
+//		o.totBal = totBal;
+//		o.customerAccounts = customerAccounts;
+//	})
+//	.catch((err) => setImmediate(() => { throw err; }));
+
+  //create internal json file to allow programmer to view
+//  let jsonO = JSON.stringify(o, null, 2);
+// fs.writeFileSync('accountData.json',jsonO);
+
+  //console.log(jsonO);
+  //res.setHeader('Content-Type', 'application/json')
+
+  //res.send(jsonO);
+
+  //respond with json file. Below is function way of doing it
+//  res.json(o);
+
+});
+
+
+//can look at JSON Data
+app.get("/displayJSONData", function(req, res){
+
+  res.sendFile(__dirname + "/displayJData.html");
+});
+
+app.get("/results", function(req, res){
+	res.sendFile(__dirname + "/results.html");
+
+});
+
+app.post("/deposit", function(req, res){
+
+  let dep = req.body.amt;
+  console.log(dep);
+
+  //take the value of dep and update database aka call helper function deposit
+  //res.send(dep);
+
+  //res.sendFile(__dirname + "/deposit.html");
+});
+
+app.post("/withdraw", function(req, res){
+
+  res.sendFile(__dirname + "/withdraw.html");
+});
+
+app.get("/transfer", function(req, res){
+
+  res.sendFile(__dirname + "/transfer.html");
+
+});
+
+app.get("/transfer", function(req, res){
+
+  res.sendFile(__dirname + "/transfer.html");
+
+});
+
+app.get("/nextAccount", function(req, res){
+
+    res.send("Work In Progress")
+
+});
+
+app.get("/addAccount", function(req, res){
+
+  res.send("Work In Progress")
+
+});
+
+app.post("/selectAccount", function(req, res){
+  let choice = req.body;
+  res.send(choice);
+});
 
 // HELPER FUNCTIONS //////////////////////////////////////////////////
 // Deposits money in the account named
@@ -150,8 +367,45 @@ function withdraw(userName, accountName, amount)
 function getAccounts(username)
 {
 	return new Promise((resolve, reject)=>{
-		let query = 'USE bankDB; SELECT users.userName, accountName, '
-		+ 'amount FROM userAccounts JOIN users ON users.userID = userAccounts.userID;'
+		let query = 'USE bankDB; SELECT accountName, '
+		+ 'amount FROM userAccounts JOIN users ON users.userID = userAccounts.userID '
+		+ "WHERE userName = '" + username + "'";
+		mysqlConn.query(query, function(err, results){
+			if(err) return reject(err);
+			else
+			{
+				let s = JSON.stringify(results[1]);
+				let json = JSON.parse(s);
+				resolve(json);
+			}
+		});
+	});
+}
+
+function getName(username)
+{
+	return new Promise((resolve, reject)=>{
+		let query = "USE bankDB; SELECT name "
+		+ "FROM users WHERE userName = '" + username + "'";
+
+		mysqlConn.query(query, function(err, results){
+			if(err) return reject(err);
+			else
+			{
+				let s = JSON.stringify(results[1]);
+				let json = JSON.parse(s);
+				resolve(json);
+			}
+		});
+	});
+}
+
+function getUserID(username)
+{
+	return new Promise((resolve, reject)=>{
+		let query = "USE bankDB; SELECT userID "
+		+ "FROM users WHERE userName = '" + username + "'";
+
 		mysqlConn.query(query, function(err, results){
 			if(err) return reject(err);
 			else
@@ -183,183 +437,5 @@ function transferAmount(userName, accountName1, accountName2, amount)
 	})
 	.catch((error) => setImmediate(() => { throw error; }));
 }
-
-
-// The handler for the home page
-// @param req - the request
-// @param res - the response
-app.get("/", function(req, res){
-
-	if(req.mysession.loggedin)
-	// Is this user logged in?
-	{
-		console.log("You're in");
-		res.redirect('/dashboard');
-	}
-	else
-	{
-		// Login required
-		res.sendFile(path.join(__dirname+ '/index.html'));
-	}
-});
-
-// The handler for the request of the login page
-// @param req - the request
-// @param res - the response
-app.post('/login', function(req, res) {
-
-	// Get the username and password data from the form
-	let userName = req.body.username;
-	let password = req.body.password;
-
-	// Construct the query
-	let query = "USE bankDB; SELECT username,password from users where userName='" + userName + "' AND password='" + password + "'";
-	console.log(query);
-
-	// Query the DB for the user
-	mysqlConn.query(query, function(err, qResult){
-
-		if(err) throw err;
-		console.log(qResult[1]);
-
-		// Does the password match?
-		let match = false;
-
-		// Go through the results of the second query
-		qResult[1].forEach(function(account){
-
-			if(account['username'] == userName && account['password'] == password)
-			{
-				console.log("Match!");
-
-				// We have a match!
-				match = true;
-
-				//break;
-			}
-		});
-
-		// Login succeeded! Set the session variable and send the user
-		// to the dashboard
-		if(match)
-		{
-			// update the cookie
-			let randomNumber=Math.random().toString();
-			randomNumber=randomNumber.substring(2,randomNumber.length);
-
-			req.mysession.loggedin = randomNumber;
-			res.redirect('/dashboard');
-		}
-		else
-		{
-			// If no matches have been found, we are done
-			res.send("<b>Failed authentication</b>");
-		}
-	});
-});
-
-// The end-point for logging out
-app.post("/logout", function(req, res){
-
-	// Kill the session
-	req.mysession.reset();
-	console.log("Session Cleared!");
-	res.redirect('/');
-
-});
-
-// The end-point for creating an account
-app.post("/create", function(req, res){
-
-
-
-});
-
-
-//Creating an endpoint to send JSON object with data
-app.get("/jsonData", function(req,res){
-
-
-
-  //hardcoded test values
-  let name = "test json first and last name";
-  let accNum = "test json 12345";
-  let totBal = "test json $10.00";
-  let customerAccounts = ['a1', 'a2', 'a3'];
-
-  //write json object into .json file
-  let o = {
-            "val1":name,
-            "val2":accNum,
-            "val3":totBal,
-            "val4":customerAccounts
-          };
-
-  //create internal json file to allow programmer to view
-  let jsonO = JSON.stringify(o, null, 2);
-  fs.writeFileSync('accountData.json',jsonO);
-
-  //console.log(jsonO);
-  //res.setHeader('Content-Type', 'application/json')
-
-  //res.send(jsonO);
-
-  //respond with json file. Below is function way of doing it
-  res.json(o);
-
-});
-
-//can look at JSON Data
-app.get("/displayJSONData", function(req, res){
-
-  res.sendFile(__dirname + "/displayJData.html");
-});
-
-app.get("/results", function(req, res){
-
-
-  res.sendFile(__dirname + "/results.html");
-
-});
-
-app.post("/deposit", function(req, res){
-
-  res.sendFile(__dirname + "/deposit.html");
-});
-
-app.post("/withdraw", function(req, res){
-
-  res.sendFile(__dirname + "/withdraw.html");
-});
-
-app.post("/transfer", function(req, res){
-  let choice = req.body;
-  res.send(choice);
-
-});
-
-app.get("/transfer", function(req, res){
-
-  res.sendFile(__dirname + "/transfer.html");
-
-});
-
-app.get("/nextAccount", function(req, res){
-
-    res.send("Work In Progress")
-
-});
-
-app.post("/selectAccount", function(req, res){
-  let choice = req.body;
-  res.send(choice);
-});
-
-
-app.post("/addAccount", function(req, res){
-  let choice = req.body;
-  res.send(choice);
-});
-
 
 app.listen(3000);

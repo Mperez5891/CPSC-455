@@ -11,7 +11,7 @@
 
           <div class="customerInfo">
 
-            <p id="name"></p>
+            <p id="name">Name</p>
 
           </div>
 
@@ -112,32 +112,72 @@
           //hard coding data
           //let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
 
-          let objValues = '';
+          //test values with an array of objects
+          let testArray = [];
 
-            fetch("http://localhost:3000/jsonData")
+          let accountInfo = {
+            name:"Cedric",
+            accountName:"first account",
+            totAmount:100
+          };
+
+          testArray.push(accountInfo);
+
+          accountInfo = {
+            name:"Cedric",
+            accountName:"second account",
+            totAmount:345
+          };
+
+          testArray.push(accountInfo);
+
+          accountInfo = {
+            name:"Cedric",
+            accountName:"third account",
+            totAmount:589
+          };
+
+          testArray.push(accountInfo);
+
+          let chosenAcct = 2;
+          let currIndex = chosenAcct;
+
+
+          //show test array 
+          console.log(testArray[currIndex].name)
+
+          let arr = testArray;
+
+			let objValues = '';
+
+            fetch("http://localhost:3000/jsonData/")
               .then(function(response) {
 
                 //below returns if passed object is json
+                console.log(response);
                 return response.json();
               })
               .then(function(values) {
                 console.log(values);
-                console.log(values.val1);
+                console.log(values.name);
 
-                let objValues = values;
+                //taken out for testing
+                //let objValues = values;
+
+                let objValues = testArray;
 
 
                 document.getElementById('name').innerHTML
-                    = "Name: " + objValues.val1;
+                    = "Name: " + objValues[currIndex].name;
 
                 document.getElementById('acct').innerHTML
-                    = "Account Name: " + objValues.val2;
+                    = "Account Name: " + objValues[currIndex].accountName;
 
                 document.getElementById('bal').innerHTML
-                    = "Total Balance: " + objValues.val3;
+                    = "Total Balance: " + objValues[currIndex].totAmount;
 
                 //hardcoded array to fill pick list
-                let arr = ["Account A", "Account B", "Account C", "Account D"];
+                //let arr = objValues.customerAccounts;
 
 
                 //aVal is array of values to fill and param2 is where to placeList
@@ -152,7 +192,7 @@
                 placeHolder.appendChild(noneChoice);
 
                   for (let i=0; i < aVal.length; i++){
-                    let pickValue = aVal[i];
+                    let pickValue = aVal[i].accountName;
                     let elem = document.createElement("option");
                     elem.text = pickValue;
                     elem.value = pickValue;
@@ -166,9 +206,7 @@
                 fillSelection(arr,'transferTo');
                 fillSelection(arr, 'transferFrom');
 
-                //fill picklist with customer name to send
-                let cNameArr = ['Customer Name Example'];
-                fillSelection(cNameArr, 'customer');
+                fillSelection(arr, 'customer');
 
 
 
