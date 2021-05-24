@@ -41,19 +41,7 @@ const  mysqlConn = mysql.createConnection({
 
 });
 
-// Parses a database of usernames and passwords
-// @param dbFile - the database file
-// @return - the list of user name and passwords
-function parseDB(dbFile)
-{
-	// Read the file
-	fs.readFile(dbFile, "utf8", function(error, data){
-
-		console.log(data);
-		data.split(";");
-
-	});
-}
+let authObj = new Object();
 
 // The handler for the home page
 // @param req - the request
@@ -64,20 +52,15 @@ app.get("/", function(req, res){
 	// Is this user logged in?
 	{
 		console.log("You're in");
-		res.redirect('/dashboard');
+		res.redirect('/results');
 	}
 	else
 	{
+		logout();
+		req.mysession.reset();
 		// Login required
 		res.sendFile(path.join(__dirname+ '/index.html'));
 	}
-});
-
-// The handler for the user's information page
-// @param req - the request
-// @param res - the response
-app.get("/", function(req, res){
-	res.sendFile(path.join(__dirname+ '/results.html'));
 });
 
 // The handler for the request of the login page
@@ -125,6 +108,8 @@ app.post('/login', function(req, res) {
 			randomNumber=randomNumber.substring(2,randomNumber.length);
 
 			req.mysession.loggedin = randomNumber;
+			authObj.username = userName;
+			authObj.authenticated = true;
 			res.redirect('/results');
 		}
 		else
@@ -136,14 +121,14 @@ app.post('/login', function(req, res) {
 });
 
 // The end-point for logging out
-app.post("/logout", function(req, res){
 
+function logout()
+{
 	// Kill the session
-	req.mysession.reset();
+	authObj = new Object();
 	console.log("Session Cleared!");
-	res.redirect('/');
+}
 
-});
 
 // The end-point for creating an account
 app.post("/create", function(req, res){
@@ -152,13 +137,10 @@ app.post("/create", function(req, res){
 
 //Creating an endpoint to send JSON object with data
 app.get("/jsonData", function(req,res){
-	//let userName = req.body.username;
-	let userName = 'testusername';
+	let userName = authObj.username;
 	
-	//hardcoded test values
 	let name = '';
-	let accNum = '';
-	let totBal = [];
+	let accID = '';
 	let customerAccounts = [];
 	let temp;
 	
@@ -168,31 +150,32 @@ app.get("/jsonData", function(req,res){
 	// Get name
 	getName(userName)
 	.then(function(rows) {
-		o.name = rows[0].name;
+		name = rows[0].name;
 		
 		getUserID(userName)
 		.then(function(rows) {
-			o.accNum = rows[0].userID;
+			accID = rows[0].userID;
 			
 			getAccounts(userName)
 			.then(function(rows) {
 				temp = rows;
 		
 				for(let i = 0; i < temp.length; i++)
-				{	
-					customerAccounts.push(temp[i].accountName);
-					totBal.push(temp[i].amount);
+				{
+					customerAccounts.push({'name':name, 'accID':accID, 'accountName':temp[i].accountName,'amount':temp[i].amount});
 				}
-				o.totBal = totBal;
-				o.customerAccounts = customerAccounts;
 				
+				o = customerAccounts;
+				console.log(o);
 				 //create internal json file to allow programmer to view
 				let jsonO = JSON.stringify(o, null, 2);
 				fs.writeFileSync('accountData.json',jsonO);
 				
 				res.json(o);
 			})
+			.catch((err) => setImmediate(() => { throw err; }));
 		})
+		.catch((err) => setImmediate(() => { throw err; }));
 	})
 	.catch((err) => setImmediate(() => { throw err; }));
 	
@@ -241,30 +224,39 @@ app.get("/displayJSONData", function(req, res){
 
 app.get("/results", function(req, res){
 
-
   res.sendFile(__dirname + "/results.html");
+});
 
+app.post("/logout", function(req, res) {
+	logout();
+	res.sendFile(__dirname + "/index.html");
 });
 
 app.post("/deposit", function(req, res){
 
-  res.sendFile(__dirname + "/deposit.html");
+  let userInput = req.body.amt;
+  deposit(authObj.currentState, userInput);
+  res.sendFile(__dirname + "/results.html");
 });
 
 app.post("/withdraw", function(req, res){
-
-  res.sendFile(__dirname + "/withdraw.html");
+  let userInput = req.body.amt;
+  withdraw(authObj.currentState, userInput);
+  res.sendFile(__dirname + "/results.html");
 });
 
-app.get("/transfer", function(req, res){
+//app.get("/transfer", function(req, res){
 
-  res.sendFile(__dirname + "/transfer.html");
+//  res.sendFile(__dirname + "/transfer.html");
 
-});
+//});
 
-app.get("/transfer", function(req, res){
-
-  res.sendFile(__dirname + "/transfer.html");
+app.post("/transfer", function(req, res){
+  
+  let userInput = req.body.tamt;
+  transferAmount(authObj.currentState,authObj.currentState, userInput);
+  res.sendFile(__dirname + "/results.html")
+  //res.sendFile(__dirname + "/transfer.html");
 
 });
 
@@ -281,16 +273,43 @@ app.get("/addAccount", function(req, res){
 });
 
 app.post("/selectAccount", function(req, res){
-  let choice = req.body;
-  res.send(choice);
+let choice = req.body;
+authObj.currentState = choice.customerAccount;
+console.log(authObj.currentState);
+//res.send(choice);
+res.sendFile(__dirname + "/results.html");
 });
 
+app.get("/test", function(req, res){
+	let userName = authObj.username;
+	
+	// Get accounts and amounts
+	getAccounts(userName)
+	.then(function(rows) {
+		let temp = rows;
+		let tempList = []; 
+		
+		for(let i = 0; i < temp.length; i++)
+		{	
+			tempList.push({
+				'accountName': temp[i].accountName,
+				'amount': temp[i].amount
+			});
+
+		}
+		
+		console.log(tempList);
+	})
+	.catch((err) => setImmediate(() => { throw err; }));
+
+});
 // HELPER FUNCTIONS //////////////////////////////////////////////////
 // Deposits money in the account named
 // @param accountName - the name of the account to deposit in
 // @param amount - amount to deposit
-function deposit(userName, accountName, amount)
+function deposit(accountName, amount)
 {		
+	let userName = authObj.username;
 	// Construct the query to get amount
 	let query = "SELECT amount FROM userAccounts "
 	+ "JOIN users ON users.userID = userAccounts.userID "
@@ -310,7 +329,7 @@ function deposit(userName, accountName, amount)
 				else
 				{
 					// Calculate new balance
-					currentBalance += amount;
+					currentBalance = (Math.trunc(currentBalance * 100) + Math.trunc(amount * 100)) / 100;
 					
 					// Update DB
 					// Construct the query to get amount
@@ -333,8 +352,9 @@ function deposit(userName, accountName, amount)
 	catch(err){console.log('Failed deposit');}
 }
 
-function withdraw(userName, accountName, amount)
+function withdraw(accountName, amount)
 {		
+	let userName = authObj.username;
 	// Construct the query to get amount
 	let query = "SELECT amount FROM userAccounts "
 	+ "JOIN users ON users.userID = userAccounts.userID "
@@ -354,7 +374,7 @@ function withdraw(userName, accountName, amount)
 				else
 				{
 					// Calculate new balance
-					currentBalance -= amount;
+					currentBalance = (Math.trunc(currentBalance * 100) - Math.trunc(amount * 100)) / 100;;
 					
 					// Update DB
 					// Construct the query to get amount
@@ -380,8 +400,9 @@ function withdraw(userName, accountName, amount)
 function getAccounts(username)
 {
 	return new Promise((resolve, reject)=>{
-		let query = 'USE bankDB; SELECT users.userName, accountName, '
-		+ 'amount FROM userAccounts JOIN users ON users.userID = userAccounts.userID;'
+		let query = 'USE bankDB; SELECT accountName, '
+		+ 'amount FROM userAccounts JOIN users ON users.userID = userAccounts.userID '
+		+ "WHERE userName = '" + username + "'"; 
 		mysqlConn.query(query, function(err, results){
 			if(err) return reject(err);			
 			else
@@ -394,8 +415,45 @@ function getAccounts(username)
 	});
 }
 
-function transferAmount(userName, accountName1, accountName2, amount)
+function getName(username)
 {
+	return new Promise((resolve, reject)=>{
+		let query = "USE bankDB; SELECT name "
+		+ "FROM users WHERE userName = '" + username + "'";
+		
+		mysqlConn.query(query, function(err, results){
+			if(err) return reject(err);			
+			else
+			{
+				let s = JSON.stringify(results[1]);
+				let json = JSON.parse(s);
+				resolve(json);
+			}
+		});
+	});
+}
+
+function getUserID(username)
+{
+	return new Promise((resolve, reject)=>{
+		let query = "USE bankDB; SELECT userID "
+		+ "FROM users WHERE userName = '" + username + "'";
+		
+		mysqlConn.query(query, function(err, results){
+			if(err) return reject(err);			
+			else
+			{
+				let s = JSON.stringify(results[1]);
+				let json = JSON.parse(s);
+				resolve(json);
+			}
+		});
+	});
+}
+
+function transferAmount(accountName1, accountName2, amount)
+{
+	let userName = authObj.username;
 	return new Promise((resolve, reject)=>{
 		try{
 			withdraw(userName, accountName1, amount);
@@ -413,5 +471,6 @@ function transferAmount(userName, accountName1, accountName2, amount)
 	})
 	.catch((error) => setImmediate(() => { throw error; }));
 }
+
 
 app.listen(3000);
