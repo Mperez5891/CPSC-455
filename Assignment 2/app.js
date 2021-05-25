@@ -48,7 +48,7 @@ let authObj = new Object();
 // @param res - the response
 app.get("/", function(req, res){
 
-	if(req.mysession.loggedin)
+	if(req.mysession.loggedin && authObj.authenticated === true)
 	// Is this user logged in?
 	{
 		console.log("You're in");
@@ -129,7 +129,6 @@ function logout()
 	console.log("Session Cleared!");
 }
 
-
 // The end-point for creating an account
 app.post("/create", function(req, res){
 
@@ -137,47 +136,57 @@ app.post("/create", function(req, res){
 
 //Creating an endpoint to send JSON object with data
 app.get("/jsonData", function(req,res){
-	let userName = authObj.username;
+	if(authObj.authenticated === true)
+	{
+		let userName = authObj.username;
 	
-	let name = '';
-	let accNum = '';
-	let totBal = [];
-	let customerAccounts = [];
-	let temp;
-	
-	//write json object into .json file
-	let o = {};
-	
-	// Get name
-	getName(userName)
-	.then(function(rows) {
-		o.name = rows[0].name;
+		let name = '';
+		let accID = '';
+		let customerAccounts = [];
+		let temp;
 		
-		getUserID(userName)
+		//write json object into .json file
+		let o = {};
+		
+		// Get name
+		getName(userName)
 		.then(function(rows) {
-			o.accNum = rows[0].userID;
+			name = rows[0].name;
 			
-			getAccounts(userName)
+			getUserID(userName)
 			.then(function(rows) {
-				temp = rows;
-		
-				for(let i = 0; i < temp.length; i++)
-				{	
-					customerAccounts.push(temp[i].accountName);
-					totBal.push(temp[i].amount);
-				}
-				o.totBal = totBal;
-				o.customerAccounts = customerAccounts;
+				accID = rows[0].userID;
 				
-				 //create internal json file to allow programmer to view
-				let jsonO = JSON.stringify(o, null, 2);
-				fs.writeFileSync('accountData.json',jsonO);
-				
-				res.json(o);
+				getAccounts(userName)
+				.then(function(rows) {
+					temp = rows;
+			
+					for(let i = 0; i < temp.length; i++)
+					{
+						customerAccounts.push({'name':name, 'accID':accID, 'accountName':temp[i].accountName,'amount':temp[i].amount});
+					}
+					
+					o = customerAccounts;
+					console.log(o);
+					 //create internal json file to allow programmer to view
+					let jsonO = JSON.stringify(o, null, 2);
+					fs.writeFileSync('accountData.json',jsonO);
+					
+					res.json(o);
+				})
+				.catch((err) => setImmediate(() => { throw err; }));
 			})
+			.catch((err) => setImmediate(() => { throw err; }));
 		})
-	})
-	.catch((err) => setImmediate(() => { throw err; }));
+		.catch((err) => setImmediate(() => { throw err; }));
+	}else
+	{
+		logout();
+		req.mysession.reset();
+		// Login required
+		res.sendFile(path.join(__dirname+ '/index.html'));
+	}
+	
 	
 	// Get user ID
 //	getUserID(userName)
@@ -218,13 +227,27 @@ app.get("/jsonData", function(req,res){
 
 //can look at JSON Data
 app.get("/displayJSONData", function(req, res){
-
-  res.sendFile(__dirname + "/displayJData.html");
+	if(req.mysession.loggedin && authObj.authenticated === true)
+		res.sendFile(__dirname + "/displayJData.html");
+	else
+	{
+		logout();
+		req.mysession.reset();
+		// Login required
+		res.sendFile(path.join(__dirname+ '/index.html'));
+	}	
 });
 
 app.get("/results", function(req, res){
-
-  res.sendFile(__dirname + "/results.html");
+	if(authObj.authenticated === true)
+		res.sendFile(__dirname + "/results.html");
+	else
+	{
+		logout();
+		req.mysession.reset();
+		// Login required
+		res.sendFile(path.join(__dirname+ '/index.html'));
+	}	
 });
 
 app.post("/logout", function(req, res) {
@@ -280,29 +303,6 @@ console.log(authObj.currentState);
 res.sendFile(__dirname + "/results.html");
 });
 
-app.get("/test", function(req, res){
-	let userName = authObj.username;
-	
-	// Get accounts and amounts
-	getAccounts(userName)
-	.then(function(rows) {
-		let temp = rows;
-		let tempList = []; 
-		
-		for(let i = 0; i < temp.length; i++)
-		{	
-			tempList.push({
-				'accountName': temp[i].accountName,
-				'amount': temp[i].amount
-			});
-
-		}
-		
-		console.log(tempList);
-	})
-	.catch((err) => setImmediate(() => { throw err; }));
-
-});
 // HELPER FUNCTIONS //////////////////////////////////////////////////
 // Deposits money in the account named
 // @param accountName - the name of the account to deposit in
