@@ -110,17 +110,11 @@
 
         <script>
 
-          let currentCustomerAccount = "";
-          let currIndex = 4;
-          let transferToAccount = "";
-          let transferFromAccount = "";
-          let transferAmount = "";
+          let currIndex = 3;
 
           function getCurrentAccount(){
-            let currentCustomerAccount = document.getElementById("customerAccount").value;
-            alert('Selection: ' + currentCustomerAccount);
-            currIndex++;
-            window.location.reload();
+            let inputValue = document.getElementById("customerAccount").value;
+            alert('Selection: ' + inputValue);
           };
 
           //validation - if/else statement to see if overdrawn
@@ -135,6 +129,47 @@
 
           }
 
+          //hard coding data
+          //let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
+
+          //test values with an array of objects
+          /*
+          let testArray = [];
+
+          let accountInfo = {
+            name:"Cedric",
+            accountName:"first account",
+            totAmount:100
+          };
+
+          testArray.push(accountInfo);
+
+          accountInfo = {
+            name:"Cedric",
+            accountName:"second account",
+            totAmount:345
+          };
+
+          testArray.push(accountInfo);
+
+          accountInfo = {
+            name:"Cedric",
+            accountName:"third account",
+            totAmount:589
+          };
+
+          testArray.push(accountInfo);
+
+          let chosenAcct = 2;
+          let currIndex = chosenAcct;
+
+
+          //show test array
+          console.log(testArray[currIndex].name)
+
+          let arr = testArray;
+          */
+
 
 
             fetch("http://localhost:3000/jsonData/")
@@ -147,39 +182,26 @@
               .then(function(values) {
                 console.log(values);
 
-                console.log(currentCustomerAccount);
-
-
-                /*
-                if(values.indexOf(currentCustomerAccount) > -1){
-
-                    currIndex = 0;
-                }
-                else
-                {
-                currIndex = values.indexOf(currentCustomerAccount);
-                }
-                */
-
-                console.log(currIndex);
-
-                console.log(values[currIndex].name);
-
                 //taken out for testing
                 //let objValues = values;
 
+                //arr is object of accounts
+                let arr = values;
 
                 document.getElementById('name').innerHTML
                     = "Name: " + values[currIndex].name;
 
                 document.getElementById('acct').innerHTML
-                    = "Account Name: " + values[currIndex].accountName;
+                    = "Account Name: " + values[currIndex].accID;
 
                 document.getElementById('bal').innerHTML
                     = "Total Balance: $" + values[currIndex].amount;
 
+                //hardcoded array to fill pick list
+                //let arr = objValues.customerAccounts;
 
-                //aVal is array of values to fill and location is where to placeList
+
+                //aVal is array of values to fill and param2 is where to placeList
                 function fillSelection(aVal, location){
 
                 let placeHolder =  document.getElementById(location)
@@ -201,8 +223,6 @@
 
                 };
 
-                let arr = values;
-
                 fillSelection(arr,'customerAccount');
                 fillSelection(arr,'transferTo');
                 fillSelection(arr, 'transferFrom');
@@ -216,8 +236,6 @@
                   console.error(error);
 
           });
-
-
 
         </script>
 
