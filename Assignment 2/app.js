@@ -131,7 +131,17 @@ function logout()
 
 // The end-point for creating an account
 app.post("/create", function(req, res){
-
+    let userName = req.body.createusername;
+    let password = req.body.createpassword;
+    let name = req.body.createname;
+    let address = req.body.address;
+    let query = "USE bankDB; INSERT INTO users (userName, password, name, address) VALUES ('" + userName + "','" + password + "','" + name + "','" + address + "')";
+    console.log(query);
+    mysqlConn.query(query, function(err, qResult) {
+        if(err) throw err;
+        console.log("Successfully created account!");
+    })
+res.redirect('/results'); 
 });
 
 //Creating an endpoint to send JSON object with data
@@ -290,9 +300,29 @@ app.get("/nextAccount", function(req, res){
 });
 
 app.get("/addAccount", function(req, res){
+	if(authObj.authenticated === true) {
+		let userName = authObj.username;
+		let userID = getUserID(userName);
+	
+		let accName = req.body.createAccName;
+		let accBalance = req.body.createAccBalance;
+		let query = "USE userAccounts; INSERT INTO userAccounts (userID, accuntName, amount) VALUES ('" + userID + "','" + accName + "','" + accBalance + "')";
+		console.log(query);
 
-  res.send("Work In Progress")
+		mysqlConn.addListener(query, function(err, qResult) {
+		if(err) throw err;
+		console.log(qResult[1]);
+		})
 
+		res.redirect('/results'); 
+	}
+	else {
+		logout();
+		req.mysession.reset();
+		// Login required
+		res.sendFile(path.join(__dirname+ '/index.html'));
+	}
+	
 });
 
 app.post("/selectAccount", function(req, res){
