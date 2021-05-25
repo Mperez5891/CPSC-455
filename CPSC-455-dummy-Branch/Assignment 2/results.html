@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+    <title>Bank_Account.js</title>
+    <body style = "background-color: lightblue;">
+
+        <h1 style = "text-align: centered; font-size: 40px; border-style: double dashed; border-color: red;"> WELCOME TO SECURE BANKING WITH BANK.JS </h1>
+		
+		<form style="float:right" name="form1" action="/logout" method="post" >
+			<label class="logoutButton">
+			<input name="submit2" type="submit" id="submit2" value="log out">
+			</label>
+		  </form>
+
+   <div id="accounts"></div>
+	<script>
+	
+fetch('http://localhost:3000/jsonData')
+.then((response) => {
+		
+		return response.json();
+		})
+.then((data) => {
+		// Work with JSON data here
+		
+			console.log(data)
+			
+			// Get the DIV tag		
+			let accountDiv = document.getElementById("accounts");
+				
+			let acctStr = "";
+	
+			for(let acct of data)
+			{
+				acctStr = acctStr + acct.name + " "  + acct.accID + " " + acct.accountName + " " + acct.amount + " <br>";
+				console.log(acct.name);
+					
+			}
+			
+			accountDiv.innerHTML = acctStr;
+		})
+.catch((err) => {
+		alert("Error!");
+		// Do something for an error here
+		})
+	
+	</script>
+
+<h1>Deposit</h1>
+<form action="/deposit1" method="POST">
+Account:
+<input type="text" name="accountName" />
+Amount:
+<input type="test" name="amount" />
+<input type="submit" />
+</form>
+<hr>
+<h1>Withdrawal</h1>
+<form action="/withdraw1" method="POST">
+Account:
+<input type="text" name="accountName" />
+Amount:
+<input type="test" name="amount" />
+<input type="submit" />
+</form>
+<hr>
+<h1>Transfer</h1>
+<form action="/transfer1" method="POST">
+Source Account:
+<input type="text" name="srcAccountName" />
+Destination Account:
+<input type="text" name="dstAccountName" />
+Amount:
+<input type="test" name="amount" />
+<input type="submit" />
+</form>
+<hr>
+<h1>Create Bank Account</h1>
+<form action="/bankAccount" method="POST">
+Bank Account Name:
+<input type="text" name="createbankname" />
+Enter the Amount:
+<input type="number" name="createamount" />
+<input type="submit" />
+</form>
+
+</html>
