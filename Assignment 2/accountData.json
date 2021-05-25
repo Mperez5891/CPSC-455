@@ -1,10 +1,14 @@
-{
-  "val1": "test json first and last name",
-  "val2": "test json 12345",
-  "val3": "test json $10.00",
-  "val4": [
-    "a1",
-    "a2",
-    "a3"
-  ]
-}
+[
+  {
+    "name": "testname",
+    "accID": 1,
+    "accountName": "testaccountname",
+    "amount": 15
+  },
+  {
+    "name": "testname",
+    "accID": 1,
+    "accountName": "henryaccount",
+    "amount": 25
+  }
+]
