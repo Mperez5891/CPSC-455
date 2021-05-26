@@ -1,20 +1,8 @@
 [
   {
-    "name": "Henry Torres",
-    "accID": 1,
-    "accountName": "testaccountname",
-    "amount": 2.97
-  },
-  {
-    "name": "Henry Torres",
-    "accID": 1,
-    "accountName": "testaccountname2",
-    "amount": 99
-  },
-  {
-    "name": "Henry Torres",
-    "accID": 1,
-    "accountName": "nice",
-    "amount": 100
+    "name": "Francisco",
+    "accID": 5,
+    "accountName": "newnew",
+    "amount": 1
   }
 ]

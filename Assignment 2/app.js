@@ -455,6 +455,25 @@ app.get("/jsonData", function(req,res){
 					
 					o = customerAccounts;
 					console.log(o);
+					
+					//////////////////json escape implementation//////////////////////
+					/*
+					let jsonString = JSON.stringify(o);
+					//console.log("Stringified" + jsonString);
+					//fs.writeFileSync('jsonDataString.txt',jsonString);
+		  
+					//sanitize json object before sending by escaping '<'
+					jsonString.replace(/</g, '\\u003c');
+					//console.log("Replaced" + jsonString);
+					//fs.writeFileSync('jsonDataReplaced.txt',jsonString);
+		  
+					let jsonO = JSON.parse(jsonString);
+					//console.log("Parsed" + jsonString);
+		  
+					fs.writeFileSync('jsonDataParsed.json',jsonO);			
+					*/
+					///////////////////////////////////////
+
 					 //create internal json file to allow programmer to view
 					let jsonO = JSON.stringify(o, null, 2);
 					fs.writeFileSync('accountData.json',jsonO);
