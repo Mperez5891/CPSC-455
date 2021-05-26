@@ -120,7 +120,7 @@
 
 			let objValues = '';
 			
-            fetch("http://localhost:3000/jsonData/")
+            fetch("http://localhost:3000/jsonData/", {credentials: 'same-origin'})
               .then(function(response) {
 
                 //below returns if passed object is json
