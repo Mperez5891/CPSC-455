@@ -1,5 +1,5 @@
-CPSC-455 
-# Group Members:
+# CPSC-455 
+## Group Members:
 Manuel Perez - mperez5891@csu.fullerton.edu
 
 Henry Torres - htorres15@csu.fullerton.edu
