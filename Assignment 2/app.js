@@ -434,7 +434,7 @@ app.post("/logout", function(req, res){
 	console.log(authObj);
 	delete authObj[req.mysession.loggedin];
 	console.log(authObj);
-	req.session.reset();
+	req.mysession.reset();
 	console.log(req.mysession.loggedin);
 	console.log("Session Cleared!");
 	res.redirect('/');
