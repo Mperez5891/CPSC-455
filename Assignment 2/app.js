@@ -454,20 +454,7 @@ app.post('/create', function(req, res){
         if(err) throw err;
         console.log("Successfully created user account!");
     })
-
-	/*
-	let accountName = req.body.createbankname;
-	let newAmount = req.body.createamount;
-	let query2 = "USE bankDB; INSERT INTO userAccounts (accountName, newAmount) VALUES ('" + accountName + "','" + newAmount + "')";
-	console.log(query2);
-	mysqlConn.query(query2, function(err, qResult) {
-        if(err) throw err;
-        console.log("Successfully created bank account!");
-    })
-	*/
-
 	res.redirect('/createBank'); 
-	//res.redirect("/createBank.html");
 });
 
 // The end-point for creating a bank account
@@ -555,9 +542,6 @@ app.get("/jsonData", function(req,res){
 });
 
 app.get("/results", function(req, res){
-	console.log("I'm in bitch!")
-	console.log(req.mysession.loggedin);
-	console.log(authObj.authenticated);
 	if(req.mysession.loggedin && authObj[req.mysession.loggedin].authenticated === true)
 		res.sendFile(__dirname + "/results.html");
 	else
