@@ -21,9 +21,9 @@ This project uses secure coding practices to develop and deploy a web based appl
 ## How to execute program:
 
 Open terminal in project directory. 
-Run command: “bash populateDB.txt” to set up database with a few test accounts. 
-Run command: “node app.js”
-Navigate to “http://localhost:3000” in browser. 
+- Run command: “bash populateDB.txt” to set up database with a few test accounts. 
+- Run command: “node app.js”
+- Navigate to “http://localhost:3000” in browser. 
 
 ## Description of how the submission fulfills each of the outlined requirements. 
 
