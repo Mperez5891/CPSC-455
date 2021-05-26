@@ -2,211 +2,187 @@
 <html>
 
     <title>Bank_Account.js</title>
+        <body style = "background-color: lightblue;">
 
-    <body style = "background-color: lightblue;">
+          <h1 style = "text-align: centered; font-size: 40px; border-style: double dashed; border-color: red;"> WELCOME TO SECURE BANKING WITH BANK.JS </h1>
 
-        <h1 style = "text-align: centered; font-size: 40px; border-style: double dashed; border-color: red;"> WELCOME TO SECURE BANKING WITH BANK.JS </h1>
-        
-        <form class="row" action="http://localhost:3000/logout" method="post">
-          <label class="logoutLblPos">
-          <input name="submit2" type="submit" id="submit2" value="log out" style="float: right;">
-          </label>
-        </form>
+        		<form style="float:right" name="form1" action="/logout" method="post" >
+        			<label class="logoutButton">
+        			<input name="submit2" type="submit" id="submit2" value="log out">
+        			</label>
+        		</form>
 
-        <h2> Customer Information </h2>
+            <div id="accounts"></div>
 
-          <div class="customerInfo">
+<script>
 
-            <p id="name"></p>
+fetch('http://localhost:3000/jsonData', {credentials: 'same-origin'})
+.then((response) => {
 
-          </div>
+		return response.json();
+		})
+.then((data) => {
+		// Work with JSON data here
 
+			console.log(data);
 
-        <h2> Select Account </h2>
+			// Get the DIV tag
+			let accountDiv = document.getElementById("accounts");
 
-        <form id="list" action="http://localhost:3000/selectAccount" method="post">
-          <label for="customerAccount">Pick An Account</label>
-            <select id="customerAccount" name="customerAccount" required/>
+			let acctStr = "";
+
+			for(let acct of data)
+			{
+        //Jonathan Edit adding text for name, account ID, account Name and account
+				acctStr = acctStr + "Account Name: " + acct.accountName + " </br>  Account Amount: " + acct.amount +
+                " <br> Customer Name: " + acct.name + " </br>  Account ID: " + acct.accID + "<br> <br> <br>";
+				console.log(acct.name);
+
+			}
+
+			accountDiv.innerHTML = acctStr;
+		})
+.catch((err) => {
+		alert("Error!");
+		// Do something for an error here
+		})
+
+	</script>
+
+    <br> <br>
+    <h1>Deposit</h1>
+
+        <form action="/deposit1" method="POST">
+
+            <!--Selection Options-->
+            <label for="depAcct1"> Account: </label>
+            <!--value sent is associated with what name attr is equal to-->
+            <select name="accountName" id="depAcct1" required/>
                 <!--Insert Options List -->
-            </select>
-          <input type="submit" value="Submit">
+            </select> <br><br>
+
+            <label for ="depAmt"> Amount: </label>
+            <input type="number" id="amount" name="amount"
+             min="0.01" max="500" step=".01" required/>
+
+            <input type="submit" />
+
         </form>
 
-        <h2> Account Details </h2>
+    <hr>
 
+    <h1>Withdrawal</h1>
+        <form action="/withdraw1" method="POST">
 
-        <div class="functions">
+          <!--Selection Options-->
+          <label for="withAcct1"> Account: </label>
+          <!--value sent is associated with what name attr is equal to-->
+          <select name="accountName" id="withAcct1" required/>
+              <!--Insert Options List -->
+          </select> <br><br>
 
-          <p id="acct"> Account Name </p> <br>
-          <p id="bal"> Account Balance </p> <br>
+          <label for ="withAmt"> Amount: </label>
+          <input type="number" id="amount" name="amount"
+           min="0.01" max="500" step=".01" required/>
 
-        </div>
+          <input type="submit" />
 
-        <div class="transactions">
+        </form>
 
-          <form action="http://localhost:3000/deposit" method="post">
-              <label for="deposit">Enter Deposit Amount</label><br>
-              <input type="number" id="dep" name="amt"
-                min="0.01" max="500" step=".01" required/> <br>
-              <input type="submit" value="Submit"><br><br>
-          </form> <br>
+    <hr>
 
-          <form action="http://localhost:3000/withdraw" method="post">
-              <label for="deposit">Enter Withdraw Amount</label><br>
-              <input type="number" id="with" name="amt"
-                min="0.01" max="500" step=".01" required/> <br>
-              <input type="submit" value="Submit"><br><br>
-          </form> <br>
+    <h1>Transfer</h1>
+        <form action="/transfer1" method="POST">
 
-
-        </div>
-
-        <h2> Customer Account Management </h2>
-        <h3> Transfer Money To Another Account </h3>
-
-        <div class="alert alert-info text-center">
-
-
-            <form id="list" action="http://localhost:3000/transfer" method="post">
-
-              <label for="transferFrom"> Transfer From Account </label>
-                <select name="transferFrom" id="transferFrom" required/>
-                    <!--Insert Options List -->
-                </select>
-
-              <br> <br>
-
-              <label for="transferTo"> Transfer To Account </label>
-                <select name="transferTo" id="transferTo" required>
-                    <!--Insert Options List -->
-                </select>
-
-              <br> <br>
-
-              <label for="transferAmount">Enter Transfer Amount</label><br>
-                <input type="number" id="tAmt" name="tAmt"
-                  min="0.01" max="500" step=".01" required/> <br>
-
-              <input type="submit" value="Submit">
-
-            </form>
-            <br> <br>
-
-            <h3> Add Another Account </h3>
-
-            <form action="http://localhost:3000/addAccount" method="post">
-
-              <label for="customer"> Customer </label>
-                <select name="customer" id="customer" required/>
-                    <!--Insert Options List -->
-                </select> <br>
-
-              <input type="radio" id="yes" name="adding" value="yes">
-              <label for="yes">Yes</label><br>
-
-              <input type="radio" id="no" name="adding" value="no" checked="checked"/>
-              <label for="no">No</label><br>
-
-              <input type="submit" value="Add">
-            </form>
-
-        </div>
-
-
-        <script>
-
-          //hard coding data
-          //let val ={name:"Andrew Test", aNum:"12345", tBal:"$123.45"};
-
-			let objValues = '';
-			
-            fetch("http://localhost:3000/jsonData/")
-              .then(function(response) {
-
-                //below returns if passed object is json
-                console.log(response);
-                return response.json();
-              })
-              .then(function(values) {
-                console.log(values);
-                console.log(values.name);
-
-                let objValues = values;
-
-
-                document.getElementById('name').innerHTML
-                    = "Name: " + objValues.name;
-
-                document.getElementById('acct').innerHTML
-                    = "Account Name: " + objValues.accNum;
-
-                document.getElementById('bal').innerHTML
-                    = "Total Balance: " + objValues.totBal;
-
-                //hardcoded array to fill pick list
-                let arr = objValues.customerAccounts;
-
-
-                //aVal is array of values to fill and param2 is where to placeList
-                function fillSelection(aVal, location){
-
-                let placeHolder =  document.getElementById(location)
-
-                //insert none value
-                let noneChoice = document.createElement("option");
-                noneChoice.text = "Choose";
-                noneChoice.value= "";
-                placeHolder.appendChild(noneChoice);
-
-                  for (let i=0; i < aVal.length; i++){
-                    let pickValue = aVal[i];
-                    let elem = document.createElement("option");
-                    elem.text = pickValue;
-                    elem.value = pickValue;
-
-                    placeHolder.appendChild(elem);
-                  }
-
-                };
-
-                fillSelection(arr,'customerAccount');
-                fillSelection(arr,'transferTo');
-                fillSelection(arr, 'transferFrom');
-
-                //fill picklist with customer name to send
-                let cNameArr = ['Customer Name Example'];
-                fillSelection(cNameArr, 'customer');
+          <!--Selection Options-->
+          <label for="srcAcct1"> Source Account: </label>
+          <!--value sent is associated with what name attr is equal to-->
+          <select name="srcAccountName" id="srcAcct1" required/>
+              <!--Insert Options List -->
+          </select> <br><br>
 
 
 
+          <!--Selection Options-->
+          <label for="dstAcct1"> Destination Account: </label>
+          <!--value sent is associated with what name attr is equal to-->
+          <select name="dstAccountName" id="dstAcct1" required/>
+              <!--Insert Options List -->
+          </select> <br><br>
 
-              }).catch(function(error){
-                  console.error(error);
+          <label for ="transferAmt"> Amount: </label>
+          <input type="number" id="amount" name="amount"
+           min="0.01" max="500" step=".01" required/>
 
-          });
+          <input type="submit" />
 
-          /*
-          fetch('accountData.json').then(function(response){
-              return response.json();
-          }).then(function(obj){
-                console.log(obj);
-          }).catch(function(error){
-                console.error('Error!!!');
-                console.error(error);
-          });
-
-          */
-        /*
-          fetch("testFile.json")
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            });
-        */
-
-        </script>
+        </form>
 
 
-    </body>
+    <hr>
 
+    <h1>Create Bank Account</h1>
+
+        <form action="/bankAccount" method="POST">
+
+            <label for ="createAcctName"> Bank Account Name </label>
+            <input type="text" name="createbankname" maxlength="16" required/>
+
+            <label for ="newAmount"> Amount: </label>
+            <input type="number" id="amount" name="createamount"
+             min="0.01" max="500" step=".01" required/>
+
+            <input type="submit" />
+
+      </form>
+
+<script>
+
+fetch('http://localhost:3000/jsonData', {credentials: 'same-origin'})
+.then((response) => {
+
+  return response.json();
+  })
+.then((data2) => {
+  // Work with JSON data here
+
+    console.log(data2);
+
+    function fillSelection(location){
+        //Populate PickList Account Options
+          let placeHolder =  document.getElementById(location);
+
+             //insert none value
+             let noneChoice = document.createElement("option");
+             noneChoice.text = "Choose";
+             noneChoice.value= "";
+             placeHolder.appendChild(noneChoice);
+
+               for (let acct2 of data2){
+                 let pickValue = acct2.accountName;
+                 console.log(acct2.accountName)
+                 let elem = document.createElement("option");
+                 elem.text = pickValue;
+                 elem.value = pickValue;
+
+                 placeHolder.appendChild(elem);
+
+               };
+    }
+
+    fillSelection("depAcct1");
+    fillSelection("withAcct1");
+    fillSelection("srcAcct1");
+    fillSelection("dstAcct1");
+
+
+
+  })
+.catch((err) => {
+  alert("Error2!");
+  // Do something for an error here
+})
+
+</script>
+</body>
 </html>
