@@ -61,7 +61,6 @@ app.get("/", function(req, res){
 	}
 });
 
-
 app.post("/transfer1", function(req, res){
 	
 	let srcAccount = req.body.srcAccountName;
@@ -69,34 +68,24 @@ app.post("/transfer1", function(req, res){
 	let amount = parseInt(req.body.amount);
 	let userName = authObj[req.mysession.loggedin].username;
 	
-	console.log("Src: " + srcAccount)
-	console.log("Dest: " + dstAccount)
-	
 	let sourceAccountExists = false;
-		
 	let dstAccountExists = false;
 
 	let result = getAccounts(userName)	
 	
-	result.then(function(rows){
-					
+	result.then(function(rows){			
 		for(let row in rows)
-		{
-			console.log("Row");
-			console.log(rows[row]);
-			
+		{	
 			if(rows[row].accountName === srcAccount)
 			{
-						sourceAccountExists = true;
-						console.log("Found the source")
+				sourceAccountExists = true;
+				console.log("Found the source")
 			}
-	
 			else if(rows[row].accountName === dstAccount)
 			{
-						dstAccountExists = true;
-						console.log("Found the destination")
+				dstAccountExists = true;
+				console.log("Found the destination")
 			}
-			
 			if(sourceAccountExists && dstAccountExists) { break ; }
 		}
 
@@ -106,57 +95,44 @@ app.post("/transfer1", function(req, res){
 			let currentBalance = 0;
 			
 			// Construct the query to get amount
-			let query = "SELECT amount FROM userAccounts "
-			+ "JOIN users ON users.userID = userAccounts.userID "
-			+ "WHERE users.userName = '" + userName + "' AND accountName = '" + srcAccount + "'";
-
-				
+			let query = "SELECT `amount` FROM `userAccounts` JOIN `users` ON `users`.`userID` = `userAccounts`.`userID` WHERE `users`.`userName` = ? AND `accountName` = ?";
+	
 			// Query the DB for the user
 			try{
-				mysqlConn.query(query, function(err, results){
-				if(err) throw err;			
+				mysqlConn.query(query, [userName, srcAccount],function(err, results){
+				if(err) res.send("<b>Transfer Withdraw Amount Not Found</b>");			
 				try{
 				currentBalance = results[0].amount;
 			
 				// Base case
 				if(amount <= 0 || amount > currentBalance)
-					throw err;
+					res.send("<b>Transfer Withdraw Amount Invalid</b>");	
 				else
 				{
 					// Calculate new balance
-					currentBalance = (Math.trunc(currentBalance * 100) - Math.trunc(amount * 100)) / 100;;
+					currentBalance = currentBalance - amount;
 					
 					// Update DB
 					// Construct the query to get amount
-					let query = "USE bankDB; UPDATE userAccounts "
-					+ "JOIN users ON users.userID = userAccounts.userID "
-					+ "SET amount = " + currentBalance
-					+ " WHERE users.userName = '" + userName + "' AND accountName = '" 
-					+ srcAccount + "'";
-					
-					console.log(query);
+					let query = "USE bankDB; UPDATE `userAccounts` JOIN `users` ON `users`.`userID` = `userAccounts`.`userID` SET `amount` = ? WHERE `users`.`userName` = ? AND `accountName` = ?";
 							
 					// Update amount
-					mysqlConn.query(query, function(err, result){
-						if(err) throw err;		
-						//console.log('Withdraw complete!')
-
+					mysqlConn.query(query, [currentBalance, userName, srcAccount],function(err, result){
+						if(err) res.send("<b>Transfer Withdraw Update Failed</b>");		
 
 				// DEPOSIT BEGINS	
 				try{
 
-				let query = "SELECT amount FROM userAccounts "
-				+ "JOIN users ON users.userID = userAccounts.userID "
-				+ "WHERE users.userName = '" + userName + "' AND accountName = '" + dstAccount + "'";
+				let query = "SELECT `amount` FROM `userAccounts` JOIN `users` ON `users`.`userID` = `userAccounts`.`userID` WHERE `users`.`userName` = ? AND `accountName` = ?";
 
-				mysqlConn.query(query, function(err, results){
-						if(err) throw err;			
-						try{
+				mysqlConn.query(query, [userName, dstAccount],function(err, results){
+					if(err) res.send("<b>Transfer Amount Not Found</b>");	
+					try{
 						currentBalance = results[0].amount;
 
 						// Base case
 						if(amount <= 0)
-						throw err;
+							res.send("<b>Transfer Amount Invalid</b>");	
 						else
 						{
 						// Calculate new balance
@@ -164,121 +140,93 @@ app.post("/transfer1", function(req, res){
 
 						// Update DB
 						// Construct the query to get amount
-						let query = "USE bankDB; UPDATE userAccounts "
-						+ "JOIN users ON users.userID = userAccounts.userID "
-						+ "SET amount = " + currentBalance
-						+ " WHERE users.userName = '" + userName + "' AND accountName = '" 
-						+ dstAccount + "'";
+						let query = "USE bankDB; UPDATE `userAccounts` JOIN `users` ON `users`.`userID` = `userAccounts`.`userID` SET `amount` = ? WHERE `users`.`userName` = ? AND `accountName` = ?";
 						
 						// Update amount
-						mysqlConn.query(query, function(err, result){
-								if(err) throw err;		
+						mysqlConn.query(query, [currentBalance, userName, dstAccount],function(err, result){
+								if(err) res.send("<b>Transfer Update Failed</b>");		
 								console.log('transfer complete!');	
-								});
+						});
 
 							res.redirect("/results");
-						}
-						}
-						catch(err){console.log('Failed transfer');  res.send("Failed trasnfer");}
+					}
+					}
+					catch(err){console.log('Failed transfer');  res.send("Failed trasnfer");}
 				});
 				}
 				catch(err){console.log('Failed trasnfer 2'); res.send("Failed trasnfer 2")}
 
-				});
-					}
-				}
+			});
+			}
 			catch(err){console.log('Failed withdraw 1');}
 			});
 		}
 		catch(err){console.log('Failed withdraw 2');}
 
-			}
-			else
-			{
-				res.send("Invalid account name");
-			}
+	}
+	else
+	res.send("Invalid account name");
 
-		})						
-	})
-
+	})						
+});
 	
 app.post("/deposit1", function(req, res){
-		console.log("In withdraw 1");
-		let accountName = req.body.accountName;	
-		let amount = parseInt(req.body.amount);
-
-		let userName = authObj[req.mysession.loggedin].username;
-
-		let result = getAccounts(userName)	
+	let accountName = req.body.accountName;	
+	let amount = parseInt(req.body.amount);
+	let userName = authObj[req.mysession.loggedin].username;
+	let result = getAccounts(userName)	
 		
-		console.log(accountName)
-		console.log(amount)
-		console.log(userName)
-		
-		result.then(function(rows){
-					
-				let found = false;	
-				for(let row in rows)
-				{
-					console.log("Row");
-					console.log(rows[row]);
-					if(rows[row].accountName === accountName)
-					{
-						found = true;
-						break
-					}
-				}
-			if(found)
+	result.then(function(rows){	
+		let found = false;	
+		for(let row in rows)
+		{
+			if(rows[row].accountName === accountName)
 			{
-				// Construct the query to get amount
-				let query = "SELECT amount FROM userAccounts "
-				+ "JOIN users ON users.userID = userAccounts.userID "
-				+ "WHERE users.userName = '" + userName + "' AND accountName = '" + accountName + "'";
-				let currentBalance = 0;
+				found = true;
+				break
+			}
+		}
+		if(found)
+		{
+			// Construct the query to get amount
+			let query = "SELECT `amount` FROM `userAccounts` JOIN `users` ON `users`.`userID` = `userAccounts`.`userID` WHERE `users`.`userName` = ? AND `accountName` = ?";
+			let currentBalance = 0;
 
-				// Query the DB for the user
+			// Query the DB for the user
+			try{
+			mysqlConn.query(query, [userName, accountName],function(err, results){
+				if(err) res.send("<b>No Amount Found</b>");			
 				try{
-				mysqlConn.query(query, function(err, results){
-						if(err) throw err;			
-						try{
-						currentBalance = results[0].amount;
+					currentBalance = results[0].amount;
 
-						// Base case
-						if(amount <= 0)
-						throw err;
-						else
-						{
+					// Base case
+					if(amount <= 0)
+						res.send("<b>Invalid amount</b>");	
+					else
+					{
 						// Calculate new balance
-						currentBalance = (Math.trunc(currentBalance * 100) + Math.trunc(amount * 100)) / 100;;
+						currentBalance = currentBalance + amount;
 
 						// Update DB
 						// Construct the query to get amount
-						let query = "USE bankDB; UPDATE userAccounts "
-						+ "JOIN users ON users.userID = userAccounts.userID "
-						+ "SET amount = " + currentBalance
-						+ " WHERE users.userName = '" + userName + "' AND accountName = '" 
-						+ accountName + "'";
+						let query = "USE bankDB; UPDATE `userAccounts` JOIN `users` ON `users`.`userID` = `userAccounts`.`userID` SET `amount` = ? WHERE `users`.`userName` = ? AND `accountName` = ?";
 
 						// Update amount
-						mysqlConn.query(query, function(err, result){
-								if(err) throw err;		
-								console.log('Deposit complete!');	
-								});
-
-							res.redirect("/results");
-						}
-						}
-						catch(err){console.log('Failed deposit');  res.send("Failed deposit");}
-				});
+						mysqlConn.query(query, [currentBalance, userName, accountName],function(err, result){
+							if(err) res.send("<b>Deposit Failed</b>");		
+						});
+						res.redirect("/results");
+					}
 				}
-				catch(err){console.log('Failed deposit'); res.send("Failed deposit 2")}
+				catch(err){console.log('Failed deposit');  res.send("Failed deposit");}
+			});
 			}
-			else
-			{
-				res.send("Invalid account name");
-			}
+			catch(err){console.log('Failed deposit'); res.send("Failed deposit 2")}
+		}
+		else
+			res.send("Invalid account name");
 		})		
-})
+});
 
 
 app.post("/withdraw1", function(req, res){
@@ -312,53 +260,45 @@ app.post("/withdraw1", function(req, res){
 				if(found)
 				{
 				// Construct the query to get amount
-				let query = "SELECT amount FROM userAccounts "
-				+ "JOIN users ON users.userID = userAccounts.userID "
-				+ "WHERE users.userName = '" + userName + "' AND accountName = '" + accountName + "'";
+				let query = "SELECT `amount` FROM `userAccounts` JOIN `users` ON `users`.`userID` = `userAccounts`.`userID` WHERE `users`.`userName` = ? AND `accountName` = ?";
 				let currentBalance = 0;
 
 				// Query the DB for the user
 				try{
-				mysqlConn.query(query, function(err, results){
-						if(err) throw err;			
+				mysqlConn.query(query, [userName, accountName] ,function(err, results){
+						if(err) res.send("<b>No Amount Found</b>");			
 						try{
 						currentBalance = results[0].amount;
 
 						// Base case
 						if(amount <= 0 || amount > currentBalance)
-						throw err;
+							res.send("<b>Invalid Amount</b>");	
 						else
 						{
 						// Calculate new balance
-						currentBalance = (Math.trunc(currentBalance * 100) - Math.trunc(amount * 100)) / 100;;
+						currentBalance = currentBalance - amount;
 
 						// Update DB
 						// Construct the query to get amount
-						let query = "USE bankDB; UPDATE userAccounts "
-						+ "JOIN users ON users.userID = userAccounts.userID "
-						+ "SET amount = " + currentBalance
-						+ " WHERE users.userName = '" + userName + "' AND accountName = '" 
-						+ accountName + "'";
+						let query = "USE bankDB; UPDATE `userAccounts` JOIN `users` ON `users`.`userID` = `userAccounts`.`userID` SET `amount` = ? WHERE `users`.`userName` = ? AND `accountName` = ?";
 
 						// Update amount
-						mysqlConn.query(query, function(err, result){
-								if(err) throw err;		
-								console.log('Withdraw complete!');	
-								});
+						mysqlConn.query(query, [currentBalance, userName, accountName], function(err, result){
+							if(err) res.send("<b>Failed Withdraw</b>");	
+							console.log('Withdraw complete!');	
+						});
 
 							res.redirect("/results");
-						}
-						}
-						catch(err){console.log('Failed withdraw');  res.send("Failed withdraw");}
-				});
+					}
 				}
-				catch(err){console.log('Failed withdraw'); res.send("Failed withdraw 2")}
+				catch(err){console.log('Failed withdraw');  res.send("Failed withdraw");}
+				});
 			}
-			else
-			{
-				res.send("Invalid account name");
-			}
-		})
+			catch(err){console.log('Failed withdraw'); res.send("Failed withdraw 2")}
+		}
+		else
+			res.send("Invalid account name");
+	})
 });
 
 // The handler for the request of the login page
@@ -370,13 +310,11 @@ app.post('/login', function(req, res) {
 	let userName = req.body.username;
 	let password = req.body.password;
 	
-	// Validate username and password
-	
 	// Construct the query
-	let query = "USE bankDB; SELECT username,password from users where userName='" + userName + "' AND password='" + password + "'";
+	let query = "USE bankDB; SELECT `username`, `password` FROM `users` WHERE `userName` = ? AND `password` = ?";
 
 	// Query the DB for the user
-	mysqlConn.query(query, function(err, qResult){
+	mysqlConn.query(query, [userName, password],function(err, qResult){
 
 		if(err) throw err;
 
@@ -422,71 +360,51 @@ app.post('/login', function(req, res) {
 	});
 });
 
-
-app.get("/createBank", function(req, res) {
-	//if(req.mysession.loggedin && authObj[req.mysession.loggedin].authenticated === true)
-    res.sendFile(__dirname + "/index.html");
-        //else
-        //      res.redirect('/logout');
-})
-
+// Log out all the things and reset
 app.post("/logout", function(req, res){
-	console.log(authObj);
 	delete authObj[req.mysession.loggedin];
-	console.log(authObj);
 	req.mysession.reset();
-	console.log(req.mysession.loggedin);
 	console.log("Session Cleared!");
 	res.redirect('/');
 });
 
 // The end-point for creating a user account
 app.post('/create', function(req, res){
-	//let userID = 1;
     let userName = req.body.createusername;
     let password = req.body.createpassword;
     let name = req.body.createname;
     let address = req.body.address;
-    let query1 = "USE bankDB; INSERT INTO users (userName, password, name, address) VALUES ('" 
-	+ userName + "','" + password + "','" + name + "','" + address + "')";
-    console.log(query1);
-    mysqlConn.query(query1, function(err, qResult) {
-        if(err) throw err;
+    let query1 = "USE bankDB; INSERT INTO users (userName, password, name, address) VALUES (?,?,?,?)";
+    
+    mysqlConn.query(query1, [userName, password, name, address],function(err, qResult) {
+        if(err) res.send("<b>Failed Create an Account</b>");
         console.log("Successfully created user account!");
+       
     })
-	res.redirect('/createBank'); 
+     res.sendFile(__dirname + "/index.html");
 });
 
 // The end-point for creating a bank account
 app.post('/bankAccount', function(req, res) {
-    let username = authObj[req.mysession.loggedin].username;
+    	let username = authObj[req.mysession.loggedin].username;
+	let accountName = req.body.createbankname;
+	let newAmount = req.body.createamount;
 	
-	let sql = "USE bankDB; SELECT userID FROM users WHERE userName='" + username + "'";
-	mysqlConn.query(sql, function(err, qResult) {
-        if(err) throw err;
-		console.log(qResult[1]);
-		console.log(qResult[1][0]);
+	let sql = "USE bankDB; SELECT `userID` FROM `users` WHERE `userName` = ?";
+	mysqlConn.query(sql, [username], function(err, qResult) {
+        if(err) res.send("<b>Failed To Create A Bank Account</b>");
 		let userID = qResult[1][0].userID;
         console.log("Successfully created bank account!");
-
-		let accountName = req.body.createbankname;
-		console.log("Here")
-	   	console.log(accountName);
-	 	let newAmount = req.body.createamount;
-		console.log(newAmount);
-		let query2 = "USE bankDB; INSERT INTO userAccounts (userID, accountName, amount) VALUES (" + userID + " ,'" + accountName + "' ," + newAmount + ")";
-		console.log(query2);
-
-		mysqlConn.query(query2, function(err, qResult) {
-        	if(err) throw err;
-        	console.log("Successfully created bank account!");
-    })
 		
-    })
-	//et userID = 
-	
-res.redirect('/results');
-})
+		let query2 = "USE bankDB; INSERT INTO `userAccounts` (`userID`, `accountName`, `amount`) VALUES (?,?,?)";
+		mysqlConn.query(query2, [userID, accountName, newAmount] ,function(err, qResult) {
+        	if(err) res.send("<b>Failed To Create A Bank Account</b>");
+        	console.log("Successfully created bank account!");
+		})
+		
+   	 })
+	res.redirect('/results');
+});
 
 //Creating an endpoint to send JSON object with data
 app.get("/jsonData", function(req,res){
@@ -529,11 +447,11 @@ app.get("/jsonData", function(req,res){
 					
 					res.json(o);
 				})
-				.catch((err) => setImmediate(() => { throw err; }));
+				.catch((err) => setImmediate(() => { res.send("<b>Failed Accounts Query</b>");}));
 			})
-			.catch((err) => setImmediate(() => { throw err; }));
+			.catch((err) => setImmediate(() => { res.send("<b>Failed ID Query</b>");}));
 		})
-		.catch((err) => setImmediate(() => { throw err; }));
+		.catch((err) => setImmediate(() => {res.send("<b>Failed Name Query</b>"); }));
 	}else
 	{
 		// Login required
@@ -550,36 +468,31 @@ app.get("/results", function(req, res){
 
 app.get("/addAccount", function(req, res){
 	if(req.mysession.loggedin && authObj[req.mysession.loggedin].authenticated === true) {
-		let userName = authObj[req.mysession.loggedin].username;
 		let userID = getUserID(userName);
-	
 		let accName = req.body.createAccName;
 		let accBalance = req.body.createAccBalance;
-		let query = "USE userAccounts; INSERT INTO userAccounts (userID, accuntName, amount) VALUES ('" + userID + "','" + accName + "','" + accBalance + "')";
+		
+		let query = "USE bankDB; INSERT INTO `userAccounts` (`userID`, `accuntName`, `amount`) VALUES (?,?,?)";
 		console.log(query);
 
-		mysqlConn.query(query, function(err, qResult) {
-		if(err) throw err;
+		mysqlConn.query(query, [userID, accName, accBalance] ,function(err, qResult) {
+		if(err) res.send("<b>Failed Add Account Query</b>");
 		console.log(qResult[1]);
 		})
 
 		res.redirect('/results'); 
 	}
-	else {
+	else 
 		res.redirect('/logout');
-	}
 	
 });
 
 // HELPER FUNCTIONS //////////////////////////////////////////////////
-
 function getAccounts(username)
 {
 	return new Promise((resolve, reject)=>{
-		let query = 'USE bankDB; SELECT accountName, '
-		+ 'amount FROM userAccounts JOIN users ON users.userID = userAccounts.userID '
-		+ "WHERE userName = '" + username + "'"; 
-		mysqlConn.query(query, function(err, results){
+		let query = "USE bankDB; SELECT `accountName`, `amount` FROM `userAccounts` JOIN `users` ON `users`.`userID` = `userAccounts`.`userID` WHERE `userName` = ?"; 
+		mysqlConn.query(query, [username], function(err, results){
 			if(err) return reject(err);			
 			else
 			{
@@ -594,10 +507,9 @@ function getAccounts(username)
 function getName(username)
 {
 	return new Promise((resolve, reject)=>{
-		let query = "USE bankDB; SELECT name "
-		+ "FROM users WHERE userName = '" + username + "'";
+		let query = "USE bankDB; SELECT `name` FROM `users` WHERE `userName` = ?";
 		
-		mysqlConn.query(query, function(err, results){
+		mysqlConn.query(query,[username] ,function(err, results){
 			if(err) return reject(err);			
 			else
 			{
@@ -612,10 +524,9 @@ function getName(username)
 function getUserID(username)
 {
 	return new Promise((resolve, reject)=>{
-		let query = "USE bankDB; SELECT userID "
-		+ "FROM users WHERE userName = '" + username + "'";
+		let query = "USE bankDB; SELECT `userID` FROM `users` WHERE `userName` = ?";
 		
-		mysqlConn.query(query, function(err, results){
+		mysqlConn.query(query, [username], function(err, results){
 			if(err) return reject(err);			
 			else
 			{
