@@ -25,7 +25,7 @@ sudo mysql -e "USE bankDB; CREATE TABLE users(
     );"
 
 
-sudo mysql -e "USE bankDB; INSERT INTO users VALUES('', 'testusername', 'testpassword', 'testname', 'testaddress'); INSERT INTO userAccounts VALUES(1, 'testaccountname', 0); GRANT ALL PRIVILEGES ON bankDB.* TO 'appaccount'@'localhost' IDENTIFIED BY 'apppass';"
-sudo mysql -e "USE bankDB; INSERT INTO users VALUES('', 'testuser2', 'testpassword2', 'name2', 'testAddy2'); INSERT INTO userAccounts VALUES(2, 'testUser2', 10);"
-sudo mysql -e "USE bankDB; INSERT INTO users VALUES('', 'testuser3', 'testpassword3', 'name3', 'testAddy3'); INSERT INTO userAccounts VALUES(3, 'testUser3', 30);"
+sudo mysql -e "USE bankDB; INSERT INTO users VALUES('', 'testusername', 'Abcd1234', 'testname', 'testaddress'); INSERT INTO userAccounts VALUES(1, 'testaccountname', 0); GRANT ALL PRIVILEGES ON bankDB.* TO 'appaccount'@'localhost' IDENTIFIED BY 'apppass';"
+sudo mysql -e "USE bankDB; INSERT INTO users VALUES('', 'testuser2', '1234Abcd', 'name2', 'testAddy2'); INSERT INTO userAccounts VALUES(2, 'testUser2', 10);"
+sudo mysql -e "USE bankDB; INSERT INTO users VALUES('', 'testuser3', 'Testpass1', 'name3', 'testAddy3'); INSERT INTO userAccounts VALUES(3, 'testUser3', 30);"
 sudo mysql -e "USE bankDB; SHOW TABLES; SELECT * FROM users; SELECT * FROM userAccounts;"
