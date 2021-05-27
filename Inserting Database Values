@@ -36,7 +36,7 @@
 	CREATE DATABASE bankDB;
 	
 	
-#Run the following commands 
+#Run the following commands - One way is to copy and paste into terminal 
 
 
 USE bankDB; 
