@@ -1,0 +1,78 @@
+###In order to run 
+
+##Helpful Commands 
+
+	#Delete Tables 
+
+		DROP TABLE users, userAccounts;
+	
+#Delete Table Contents 
+
+	DELETE FROM users; DELETE FROM userAccounts; 
+
+#Please install the following 
+	
+
+	sudo apt-get update
+	
+	sudo apt-get install mariadb-server
+	sudo service mariadb start
+	sudo mysql_secure_installation
+	
+#Press enter when prompted for the current root password
+#Provide a new root password
+#Retype the root password
+#Answer "Yes" to all questions
+#Connect to the DB from command line as root user:
+
+   sudo mysql -u root -p
+
+#Provide the root password
+
+#Create a database called "bankDB"
+
+	DROP DATABASE IF EXISTS bankDB;
+
+	CREATE DATABASE bankDB;
+	
+	
+#Run the following commands 
+
+
+USE bankDB; 
+
+USE bankDB; CREATE TABLE users(
+    userID INT AUTO_INCREMENT,
+    userName VARCHAR(25) UNIQUE NOT NULL,
+    password VARCHAR(25) NOT NULL,
+    name VARCHAR(25) NOT NULL,
+    address VARCHAR(50) NOT NULL,
+    PRIMARY KEY(userID)
+    ); CREATE TABLE userAccounts(
+    userID INT NOT NULL,
+    accountName VARCHAR(25) NOT NULL,
+    amount FLOAT NOT NULL
+    );
+
+GRANT ALL PRIVILEGES ON bankDB.* TO 'appaccount'@'localhost' IDENTIFIED BY 'apppass';
+
+INSERT INTO users(userID, userName, password, name, address) VALUES(1, 'testusername', 'Abcd1234', 'testname', 'testaddress'); 
+
+INSERT INTO userAccounts(userID, accountName, amount) VALUES(1, 'testaccountname', 0);
+
+
+INSERT INTO users(userID, userName, password, name, address) VALUES(2, 'testuser2', '1234Abcd', 'name2', 'testAddy2'); 
+
+INSERT INTO userAccounts(userID, accountName, amount) VALUES(2, 'Account A', 10);
+INSERT INTO userAccounts(userID, accountName, amount) VALUES(2, 'Account B', 20);
+
+INSERT INTO users (userID, userName, password, name, address) VALUES(3, 'CedricTheGreat', 'Abcd2021', 'Cedric Smith', '145 MoonBrook Lane'); 
+
+INSERT INTO userAccounts(userID, accountName, amount) VALUES(3, 'Account Red', 10);
+INSERT INTO userAccounts(userID, accountName, amount) VALUES(3, 'Account Black', 115);
+INSERT INTO userAccounts(userID, accountName, amount) VALUES(3, 'Account Green', 72);
+INSERT INTO userAccounts(userID, accountName, amount) VALUES(3, 'Account Yellow', 20.11);
+
+SHOW TABLES; SELECT * FROM users; SELECT * FROM userAccounts;
+
+
